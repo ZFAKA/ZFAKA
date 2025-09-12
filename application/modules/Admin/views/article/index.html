@@ -1,0 +1,85 @@
+<?php include ADMIN_COMMON_PATH.'/header.html';?>
+<div class="layui-container fly-marginTop fly-user-main">
+    <?php include ADMIN_COMMON_PATH.'/article-nav.html';?>
+    <div class="fly-panel fly-panel-user" pad20>
+        <div class="layui-tab layui-tab-brief" lay-filter="user">
+            <ul class="layui-tab-title" id="LAY_mine">
+                <li class="layui-this" lay-id="info">文章管理</li>
+                <li class="" lay-id="info"><a href="/<?php echo ADMIN_DIR;?>/article/add/">添加文章</a></li>
+            </ul>
+            <div class="layui-tab-content" style="padding: 20px 0;">
+                <div class="layui-form layui-form-pane layui-tab-item layui-show">
+                    <div class="layui-form-item layui-show">
+                        <blockquote class="layui-elem-quote">
+                            <p>说明：</p>
+                            <p>文章可以用于发布通知、使用说明等内容</p>
+                        </blockquote>
+                        <table class="layui-table" id="table" lay-filter="table"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="status">
+    {{# if(d.status == 1){ }}
+    <span class="layui-badge layui-bg-green">已发布</span>
+    {{# } else { }}
+    <span class="layui-badge layui-bg-gray">草稿</span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="opt">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="/article/{{d.id}}.html" target="_blank">预览</a>
+    <a class="layui-btn layui-btn-warm layui-btn-xs" href="/<?php echo ADMIN_DIR;?>/article/edit/?id={{d.id}}">编辑</a>
+    <a data-href="/<?php echo ADMIN_DIR;?>/article/delete/?id={{d.id}}" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+</script>
+
+<!--引入公共底文件-->
+<?php include ADMIN_COMMON_PATH.'/footer.html';?>
+<script>
+layui.use(['table', 'layer'], function(){
+    var table = layui.table;
+    var layer = layui.layer;
+
+    table.render({
+        elem: '#table',
+        url: '/<?php echo ADMIN_DIR;?>/article/ajax/',
+        cellMinWidth: 80,
+        cols: [[
+            {field: 'id', width: 80, title: 'ID', sort: true},
+            {field: 'title', title: '标题', minWidth: 200},
+            {field: 'status', width: 100, title: '状态', templet: '#status'},
+            {field: 'views', width: 100, title: '阅读量', sort: true},
+            {field: 'sort', width: 100, title: '排序', sort: true},
+            {field: 'created_at_formatted', width: 150, title: '创建时间'},
+            {field: 'updated_at_formatted', width: 150, title: '更新时间'},
+            {width: 180, title: '操作', toolbar: '#opt'}
+        ]],
+        page: true,
+        limit: 10,
+        limits: [10, 20, 50, 100]
+    });
+
+    table.on('tool(table)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'del'){
+            layer.confirm('确认删除这篇文章吗？', function(index){
+                layer.close(index);
+                layer.load(2);
+                
+                $.get(obj.tr.find('a[lay-event="del"]').data('href'), function(res){
+                    layer.closeAll('loading');
+                    if(res.code == 1){
+                        layer.msg(res.msg, {icon: 1});
+                        obj.del();
+                    } else {
+                        layer.msg(res.msg, {icon: 2});
+                    }
+                }, 'json');
+            });
+        }
+    });
+});
+</script>

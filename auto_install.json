@@ -1,0 +1,17 @@
+{	
+	"php_ext":"yaf",			
+	"chmod":[
+				{"mode":777,"path":"/public/res/upload"},
+				{"mode":777,"path":"/conf/application.ini"},
+				{"mode":777,"path":"/install"},
+				{"mode":777,"path":"/temp"},
+				{"mode":777,"path":"/log"}
+			],	
+	"success_url":"/",				
+	"php_versions":"71,72,73",	
+	"db_config":"",	
+	"admin_username":"",
+	"admin_password":"",
+	"run_path":"/public",
+    "remove_file":""
+}

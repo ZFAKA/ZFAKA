@@ -1,0 +1,105 @@
+<?php include '../templates/shadan/common/header.html';?>
+<div class="layui-container fly-marginTop fly-user-main">
+    <div class="layui-row">
+		<!-- 公告-->
+		<?php if(isset($config['notice']) AND $config['notice']):?>
+		<blockquote class="layui-elem-quote layui-text" style="background-color: #ffffff;">
+			<i class="layui-icon layui-icon-speaker"></i><?php echo $config['notice'];?>
+		</blockquote>
+		<?php endif;?>
+        
+		<!--电脑端-->
+		<?php if(!empty($products)):?>
+			<?php foreach($products_type_active AS $type):?>
+			<div class="layui-card layui-hide-xs">
+				<div class="layui-card-header"><?php echo $type['name'];?></div>
+				<div class="layui-card-body">
+					<table class="layui-table">
+						<colgroup>
+							<col>
+							<col width="100">
+							<col width="80">
+							<col width="80">
+							<col width="80">
+							<col width="120">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>商品名称</th>
+								<th>发货模式</th>
+								<th>库存</th>
+								<th>销量</th>
+								<th>单价</th>
+								<th align="center" style="text-align: center !important;">操作</th>
+							</tr> 
+						 </thead>
+						 <tbody>
+					<?php foreach($products AS $p):?>
+						<?php if($p['typeid']==$type['id']):?>
+							<tr>
+								<td><?php echo $p['name'];?></td>
+								<td><?php if($p['auto']>0):?><span class="layui-badge layui-bg-green">自动发货</span><?php else:?><span class="layui-badge layui-bg-gray">手工发货</span><?php endif;?></td>
+								<td><?php if($p['stockcontrol']>0):?><?php echo $p['qty'];?><?php else:?>不限量<?php endif;?></td>
+								<td><?php echo $p['qty_sell'];?></td>
+								<td><?php echo $p['price'];?></td>
+								<td align="center"><a class="layui-btn layui-btn-warm layui-btn-xs" href="/product/<?php echo $p['id'];?>.html">购买</a></td>
+							</tr>
+						<?php endif;?>
+					<?php endforeach;?>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<?php endforeach;?>
+		<?php endif;?>
+		
+		<!--移动端-->
+		<?php if(!empty($products)):?>
+			<?php foreach($products_type_active AS $type):?>
+			<div class="layui-card layui-hide-md">
+				<div class="layui-card-header"><?php echo $type['name'];?></div>
+				<div class="layui-card-body">
+
+					<?php foreach($products AS $p):?>
+						<?php if($p['typeid']==$type['id']):?>
+						<a href="/product/<?php echo $p['id'];?>.html">
+							<div class="layui-col-md3 layui-col-sm4 goodsdetail">
+								<div class="goodsdetail-mobile">
+									<div class="goodsdetail-mobile-img">
+										<?php if(strlen($p['imgurl'])>0):?>
+											<img src="<?php echo $p['imgurl'];?>"> 
+										<?php else:?>
+											<img src="/res/images/noimg.jpg"> 
+										<?php endif;?>
+									</div>
+									<div class="goodsdetail-mobile-text">
+										<p class="biaozhi"> 
+											<?php if($p['auto']>0):?><span class="layui-badge layui-bg-green">自动发货</span><?php else:?><span class="layui-badge layui-bg-gray">手工发货</span><?php endif;?>
+											<?php if($p['iszhekou']>0):?><span class="layui-badge layui-bg-orange">有折扣</span><?php endif;?>
+										</p>
+										<p class="title"><?php echo $p['name'];?></p>
+										<p>
+											<span>库存: <?php if($p['stockcontrol']>0):?><?php echo $p['qty'];?><?php else:?>不限量<?php endif;?>&nbsp;|&nbsp;销量: <?php echo $p['qty_sell'];?>&nbsp;|&nbsp;</span>
+											<span class="price"><b>￥<?php echo $p['price'];?></b></span>
+										</p>
+									</div>
+								</div>
+							</div>
+						</a>
+						<?php endif;?>
+					<?php endforeach;?>
+
+				</div>
+			</div>
+			<?php endforeach;?>
+		<?php endif;?>
+		
+    </div>
+</div>
+<div id="layerad" style="display: none;"><?php echo $config['layerad'];?></div>
+<!--引入公共底文件-->
+<?php include '../templates/shadan/common/footer.html';?>
+<script>
+	layui.use('product');
+	var PIFA = "";
+</script>

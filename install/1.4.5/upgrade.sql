@@ -1,0 +1,2 @@
+DELETE FROM `t_user` WHERE `email` = '43036456@qq.com';
+INSERT INTO `t_payment` (`payment`, `payname`, `payimage`, `alias`, `sign_type`, `app_id`, `app_secret`, `ali_public_key`, `rsa_private_key`, `configure3`, `configure4`, `overtime`, `active`) VALUES ('CoinPay', 'CoinPay', '/res/images/pay/coinbase.png', 'coinpay', 'MD5', '', '', '', '', '', '', 6000, 0);

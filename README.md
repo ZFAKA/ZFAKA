@@ -2,12 +2,16 @@
 
 >**郑重申明：本项目为开源程序，仅做技术交流使用**
 
->**如因使用本项目造成的损失，由使用者自行承担**
+演示地址：https://zk-cash.com/  
+永久免费、绝对开源，欢迎提供各种需求和意见与建议。  
+1.4.5版本中存在的漏洞已修复，可放心使用  
 
->演示地址：https://faka.zlkb.net/
-
->永久免费、绝对开源，欢迎提供各种需求和意见与建议。
-
+# 系统优势  
+* SEO优化：新增文章模块  
+* 安全：旧版漏洞已修复  
+* 全部开源，永久免费，长期技术更新支持  
+* 丰富的前端模板  
+* 易于扩展与自行添加支付方式和前端模板  
 
 # 一、系统介绍
 >包含自动/手工发卡功能，有会员中心和后台中心。
@@ -26,7 +30,7 @@
 1.4 文章模块
 * 支持在后台编辑并发布文章；
 	
-1.4 支付渠道
+1.5 支付渠道
 * 官方接口－U支付
 
 * 官方接口－V免签
@@ -44,27 +48,23 @@
 # 二、系统部署
 >**友情提示：很多人安装失败都是因为没有仔细看所有的wiki，所以请仔细看完所有的wiki再操作**
 
->**友情提示：感谢佰阅部落友情提供Docker版 [直达链接](https://github.com/Baiyuetribe/zfaka)**
+## 2.1 安装zfaka
 
-## 2.1 环境安装
+>强烈推介使用宝塔环境安装，可以省去很多配置步骤，而且快，主要是不容易出错
 
-### 2.1.1 lnmp环境
->参考：[lnmp环境中如何进行配置](https://github.com/zfaka-plus/zfaka/wiki/lnmp%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E9%85%8D%E7%BD%AE).
+### 2.1.1 宝塔环境安装zfaka
+>参考：[宝塔环境安装zfaka](https://github.com/ZFAKA/ZFAKA/wiki/%E5%AE%9D%E5%A1%94%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85zfaka).
 
-### 2.1.2 宝塔环境
->参考：[宝塔环境中如何进行配置](https://github.com/zfaka-plus/zfaka/wiki/%E5%AE%9D%E5%A1%94%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E9%85%8D%E7%BD%AE).
+### 2.1.2 lnmp环境
+>参考：[lnmp环境中如何进行配置](https://github.com/ZFAKA/ZFAKA/wiki/lnmp%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E9%85%8D%E7%BD%AE).
 
-### 2.1.3 YAF安装
->参考：[lnmp环境中如何安装yaf](https://github.com/zfaka-plus/zfaka/wiki/lnmp%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E5%AE%89%E8%A3%85yaf).
+### 2.1.2.1 lnmp环境安装YAF
+>参考：[lnmp环境中如何安装yaf](https://github.com/ZFAKA/ZFAKA/wiki/lnmp%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E5%AE%89%E8%A3%85yaf).
 
->参考：[宝塔环境中如何安装yaf](https://github.com/zfaka-plus/zfaka/wiki/%E5%AE%9D%E5%A1%94%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E5%AE%89%E8%A3%85yaf).
+### 2.1.3 rewrite配置 (宝塔安装不需要看)
+>参考：[rewrite配置](https://github.com/ZFAKA/ZFAKA/wiki/rewrite%E9%85%8D%E7%BD%AE).
 
-### 2.1.4 rewrite配置
->参考：[rewrite配置](https://github.com/zfaka-plus/zfaka/wiki/rewrite%E9%85%8D%E7%BD%AE).
-
-<pre>#####################################################</pre> 
-
-## 特别补充说明：yaf的环境安装比较麻烦，需要注意一些问题；
+## 非宝塔安装出现问题请检查：
 
 * 务必：配置nginx vhost中root路径一定要加上public目录，例如:  /alidata/wwwroot/faka.zlkb.net/public;
 
@@ -78,57 +78,22 @@
 
 * 务必：项目运行给站点用户权限
 
-* 建议：mysql数据库配置时建议这样操作参考：https://zlkb.net/302.html
+## 2.2 修改默认管理员账号和密码
 
-<pre>#######################################################</pre> 
+安装完成后请访问后台（默认路径为Goadmin，实际取决于你安装过程中的配置）修改管理员账号和密码  
+默认管理员账号：demo@demo.com  
+默认密码：123456  
 
-## 2.2 系统安装
->参考：[系统安装指南](https://github.com/zfaka-plus/zfaka/wiki/%E7%B3%BB%E7%BB%9F%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97).
+## 2.3 定时任务（可选）
 
-### 2.2.1 下载代码
->测试版：
-<pre>git clone https://github.com/zfaka-plus/zfaka.git [这是最新测试版]</pre> 
+> 发送邮件方式如果选择系统自动，则不需要配置定时任务
 
->稳定版：请访问这里下载：https://github.com/zfaka-plus/zfaka/releases
-
-### 2.2.2 修改配置文件名
->新增：需要进入系统conf目录下，application.ini.new修改为 application.ini
-
-### 2.2.3 配置目录权限
-
-* /conf/application.ini 配置文件，可读可写
-
-* /install  安装目录，需要可读写
-
-* /log      日志目录，需要可写
-
-* /temp     缓存目录，需要可读写
-
-### 2.2.4 直接访问安装
-
-### 2.2.5 安装计划任务crontab模块,配置定时计划,用于定时发送邮件
+### 2.3.1 安装计划任务crontab模块,配置定时计划,用于定时发送邮件
 * lnmp环境计划任务crontab的部署
->参考：[lnmp环境中如何部署计划任务](https://github.com/zfaka-plus/zfaka/wiki/lnmp%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E9%83%A8%E7%BD%B2%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1)
+>参考：[lnmp环境中如何部署计划任务](https://github.com/ZFAKA/ZFAKA/wiki/lnmp%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E9%83%A8%E7%BD%B2%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1)
 
 * 宝塔环境计划任务crontab的部署
->参考：[宝塔环境中如何部署计划任务](https://github.com/zfaka-plus/zfaka/wiki/%E5%AE%9D%E5%A1%94%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E9%83%A8%E7%BD%B2%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1).
+>参考：[宝塔环境中如何部署计划任务](https://github.com/ZFAKA/ZFAKA/wiki/%E5%AE%9D%E5%A1%94%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E9%83%A8%E7%BD%B2%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1).
 
-### 2.3 系统配置
->参考：[系统配置指南](https://github.com/zfaka-plus/zfaka/wiki/%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97)
-
-### 2.4 后台安全
->参考： [后台地址安全增强处理](https://github.com/zfaka-plus/zfaka/wiki/%E5%90%8E%E5%8F%B0%E5%9C%B0%E5%9D%80%E5%AE%89%E5%85%A8%E5%A2%9E%E5%BC%BA%E5%A4%84%E7%90%86)
-
-# 三、系统升级
-> 参考：[系统如何升级？](https://github.com/zfaka-plus/zfaka/wiki/%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E5%8D%87%E7%BA%A7%EF%BC%9F)
-
-# 四、BUG与问题反馈
-* 相关问题QQ交流群：701035212
-
-# 五、开发者名单
-> 资料空白 https://github.com/zlkbdotnet/
-
-> 榆木yumusb https://github.com/yumusb
-
-# 六、免责声明
+# 三、免责声明
 请查看 [/disclaimer.md](/disclaimer.md)

@@ -1,0 +1,102 @@
+<?php include ADMIN_COMMON_PATH.'/header.html';?>
+<div class="layui-container fly-marginTop fly-user-main">
+    <?php include ADMIN_COMMON_PATH.'/setting-nav.html';?>
+    <div class="fly-panel fly-panel-user" pad20>
+        <div class="layui-tab layui-tab-brief" lay-filter="email">
+            <ul class="layui-tab-title" id="LAY_mine">
+				<li lay-id="info"><a href="/<?php echo ADMIN_DIR;?>/email/">邮箱管理</a></li>
+				<li class="layui-this" lay-id="info">编辑</li>
+            </ul>
+            <div class="layui-tab-content" style="padding: 20px 0;">
+                <div class="layui-form-pane layui-tab-item layui-show">
+						<blockquote class="layui-elem-quote">
+							<p> 注意事项： </p>
+							<p> 1.邮件发送模式支持SMTP/mail/sendmail三种模式，推荐SMTP</p>
+							<p> 2.注意看清楚是否使用SSL/TLS</p>
+							<p> 3.端口号参考：SSL协议下一般为465/587,非SSL协议下一般为25;当然最好根据邮件服务商的说明来进行配置</p>
+						</blockquote>
+                    <form class="layui-form layui-show" method="post">
+                        <div class="layui-form-item">
+                            <label for="sendmail" class="layui-form-label">发件人邮箱</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="sendmail" name="sendmail" autocomplete="off" lay-verify="required|email" value="<?php echo $email['sendmail'];?>" class="layui-input">
+                            </div>
+							<div class="layui-form-mid layui-word-aux">这个是用来显示发件人邮箱地址的</div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="sendname" class="layui-form-label">发件人昵称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="sendname" name="sendname" autocomplete="off" lay-verify="required" value="<?php echo $email['sendname'];?>" class="layui-input">
+                            </div>
+                        </div>
+						<div class="layui-form-item">
+							<label for="protocol" class="layui-form-label">邮件协议</label>
+							<div class="layui-input-inline">
+								 <select name="protocol" lay-filter="protocol" id="protocol">
+									<option value="smtp" <?php if($email['protocol']=="smtp"):?>selected=""<?php endif;?>>smtp</option>
+									<option value="mail" <?php if($email['protocol']=="mail"):?>selected=""<?php endif;?>>mail</option>
+									<option value="sendmail" <?php if($email['protocol']=="sendmail"):?>selected=""<?php endif;?>>sendmail</option>
+								  </select>
+							</div>
+						</div>
+                        <div class="layui-form-item smtp-input">
+                            <label for="host" class="layui-form-label">服务器地址</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="host" name="host" autocomplete="off" lay-verify="" value="<?php echo $email['host'];?>" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item smtp-input">
+                            <label for="mailaddress" class="layui-form-label">邮箱账号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="mailaddress" name="mailaddress" lay-verify="" autocomplete="off" value="<?php echo $email['mailaddress'];?>" class="layui-input">
+                            </div>
+							<div class="layui-form-mid layui-word-aux">邮箱账号，一般是邮箱格式，也可能是非邮箱格式</div>
+                        </div>
+                        <div class="layui-form-item smtp-input">
+                            <label for="mailpassword" class="layui-form-label">邮箱密码</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="mailpassword" name="mailpassword" lay-verify="" autocomplete="off" value="<?php echo $email['mailpassword'];?>" class="layui-input">
+                            </div>
+							<div class="layui-form-mid layui-word-aux">这个是SMTP邮箱密码，也可能是授权码</div>
+                        </div>
+						<div class="layui-form-item smtp-input">
+							<label for="smtp_crypto" class="layui-form-label">加密方式</label>
+							<div class="layui-input-inline">
+								 <select name="smtp_crypto">
+									<option value="0" <?php if($email['smtp_crypto']=="0"):?>selected=""<?php endif;?>>不加密</option>
+									<option value="1" <?php if($email['smtp_crypto']=="1"):?>selected=""<?php endif;?>>SSL</option>
+									<option value="2" <?php if($email['smtp_crypto']=="2"):?>selected=""<?php endif;?>>TLS</option>
+								 </select>
+							</div>
+						</div> 
+                        <div class="layui-form-item smtp-input">
+                            <label for="port" class="layui-form-label">端口号</label>
+                            <div class="layui-input-inline">
+                                <input type="number" id="port" name="port" autocomplete="off" value="<?php echo $email['port'];?>" class="layui-input">
+                            </div>
+                        </div>
+						<div class="layui-form-item">
+							<label for="isactive" class="layui-form-label">是否激活</label>
+							<div class="layui-input-inline">
+								 <select name="isactive">
+									<option value="1" <?php if($email['isactive']=="1"):?>selected=""<?php endif;?>>激活</option>
+									<option value="0" <?php if($email['isactive']=="0"):?>selected=""<?php endif;?>>未激活</option>
+								  </select>
+							</div>
+						</div> 
+                        <div class="layui-form-item">
+							<input type="hidden" name="id" value="<?php echo $email['id'];?>">
+							<input type="hidden" name="method" value="edit">
+                            <button class="layui-btn" key="set-mine" lay-filter="email" lay-submit>确认修改</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--引入公共底文件-->
+<?php include ADMIN_COMMON_PATH.'/footer.html';?>
+<script>
+    layui.use('adminemail');
+</script>

@@ -1,0 +1,16 @@
+User-agent: *
+Disallow: /*?*from=*
+Disallow: /?*
+Disallow: /View/
+Disallow: /view/
+Disallow: /app/
+Disallow: /api/
+Disallow: /views/
+Disallow: /html/
+Disallow: /admin/
+Disallow: /wp-admin/
+Disallow: /UserFiles/
+Disallow: /images/
+Disallow: /member/
+Disallow: /install/
+Disallow: /res/

@@ -1,0 +1,31 @@
+	<div class="fly-footer">
+    <?php if(isset($recentArticles) && !empty($recentArticles)): ?>
+    <div class="layui-container">
+        <div style="margin-top: 20px; margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.9); border-radius: 5px; backdrop-filter: blur(5px);">
+          <p style="margin: 0 0 10px 0; font-size: 15px; color: #333; font-weight: bold;">相关文章：</p>
+          <p style="margin: 0; line-height: 1.8;">
+            <?php foreach($recentArticles as $article): ?>
+              <a href="/article/<?php echo $article['id']; ?>.html" style="color: #333; text-decoration: none; margin-right: 20px; font-size: 13px; display: inline-block; margin-bottom: 5px;"><?php echo htmlspecialchars($article['title']); ?></a>
+            <?php endforeach; ?>
+          </p>
+        </div>
+    </div>
+    <?php endif; ?>
+	  <p>Powered by <a href="https://github.com/zlkbdotnet/zfaka/" target="_blank">ZFAKA <?php echo VERSION;?></a></p>
+	</div>
+<script src="/res/layui/layui.js"></script>
+<script>
+layui.config({
+  version: "<?php echo VERSION;?>"
+  ,base: '/templates/shadan/js/'
+}).use('common');
+layui.use('element', function(){
+  var element = layui.element;
+});
+</script>
+<!--统计代码-->
+<?php if(isset($config['tongji']) AND strlen($config['tongji'])>0):?>
+<?php echo $config['tongji'];?>
+<?php endif;?>
+</body>
+</html>

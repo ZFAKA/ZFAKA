@@ -1,0 +1,105 @@
+<?php include '../templates/hibiscus/common/header.html';?>
+<div class="layui-container fly-marginTop fly-user-main">
+    <div class="layui-row">
+		<!-- 公告-->
+		<?php if(isset($config['notice']) AND $config['notice']):?>
+		<blockquote class="layui-elem-quote layui-text" style="background-color: #ffffff;">
+			<i class="layui-icon layui-icon-speaker"></i><?php echo $config['notice'];?>
+		</blockquote>
+		<?php endif;?>
+        <div class="layui-card layui-form-pane">
+            <div class="layui-card-header layui-hide-xs">商品列表</div>
+			<div class="layui-tab-brief layui-hide-md"><ul class="layui-tab-title"><li class="layui-this">商品列表</li><li class=""><a href="/product/query">查询订单</a></li></ul></div>
+            <div class="goodslist-mobile">
+				<div class="layui-row product-list-two-view" id ="product-list-two-view"></div>
+				<div id="more" class="layui-row"></div>
+			</div>
+		</div>
+    </div>
+</div>
+
+<script id="product_list_two_tpl" type="text/html">
+{{#  if(d.data.length === 0){ }}
+{{# }else{ }}
+	{{# layui.each(d.data, function(index, item){ }}
+		<div class="layui-col-md3 layui-col-sm4 goodsdetail">
+			<a href="/product/{{item.id}}.html">
+			<div class="goodsdetail-container">
+				<div class="goodsdetail-img">
+						{{#  if(item.imgurl.length === 0){ }}
+							<img src="/res/images/noimg.jpg"> 
+							{{# }else{ }}
+							<img src="{{ item.imgurl}}"> 
+						{{#  } }} 
+				</div>
+				<div class="goodsdetail-text">
+					<!-- 第一行 -->
+					<div class="row">
+						<div class="price"><b>￥{{ item.price}}</b></div>
+						<div class="kucun">{{ item.qty_sell}}人付款</div>
+					</div>
+					
+					<div class="title">
+						{{ item.name}}
+					</div>	
+					
+					<div class="biaozhi">
+						{{#  if(item.auto=="1"){ }}
+							<span class="layui-badge layui-bg-green">自动发货</span>
+						{{# }else{ }}
+							<span class="layui-badge layui-bg-black">手工发货</span>
+						{{#  } }} 
+						
+						{{#  if(item.iszhekou=="1"){ }}
+						<span class="layui-badge layui-bg-orange">有折扣</span>
+						{{#  } }} 
+					</div>
+					
+				</div>
+			</div>
+			</a>
+		</div>
+	{{#  }); }}
+{{#  } }} 
+</script>
+<script id="product_list_two_mobile_tpl" type="text/html">
+{{#  if(d.data.length === 0){ }}
+{{# }else{ }}
+	{{# layui.each(d.data, function(index, item){ }}
+		<div class="layui-col-md3 layui-col-sm4 goodsdetail">
+			<div class="goodsdetail-mobile">
+                <div class="goodsdetail-mobile-img">
+					<a href="/product/{{item.id}}.html">
+					{{#  if(item.imgurl.length === 0){ }}
+						<img src="/res/images/noimg.jpg"> 
+					{{# }else{ }}
+						<img src="{{ item.imgurl}}"> 
+					{{#  } }} 
+					</a>
+                </div>
+                <div class="goodsdetail-mobile-text">
+                    <p class="price"><b>￥{{ item.price}}</b></p>
+					<p class="title">{{ item.name}}</p>
+					<p class="biaozhi"> 
+						{{#  if(item.auto=="1"){ }}
+							<span class="layui-badge layui-bg-green">自动发货</span>
+						{{# }else{ }}
+							<span class="layui-badge layui-bg-black">手工发货</span>
+						{{#  } }} 
+						
+						{{#  if(item.iszhekou=="1"){ }}
+						<span class="layui-badge layui-bg-orange">有折扣</span>
+						{{#  } }} 
+					</p>
+                </div>
+            </div>
+		</div>
+	{{#  }); }}
+{{#  } }} 
+</script>
+<div id="layerad" style="display: none;"><?php echo $config['layerad'];?></div>
+<!--引入公共底文件-->
+<?php include '../templates/hibiscus/common/footer.html';?>
+<script>
+layui.use('product-list-two');
+</script>

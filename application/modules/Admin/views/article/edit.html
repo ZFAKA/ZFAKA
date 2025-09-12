@@ -1,0 +1,323 @@
+<?php include ADMIN_COMMON_PATH.'/header.html';?>
+<!-- 添加wangEditor CSS -->
+<link rel="stylesheet" href="https://unpkg.com/@wangeditor/editor@latest/dist/css/style.css">
+<div class="layui-container fly-marginTop fly-user-main">
+    <?php include ADMIN_COMMON_PATH.'/article-nav.html';?>
+    <div class="fly-panel fly-panel-user" pad20>
+        <div class="layui-tab layui-tab-brief" lay-filter="article">
+            <ul class="layui-tab-title" id="LAY_mine">
+                <li class="" lay-id="info"><a href="/<?php echo ADMIN_DIR;?>/article">文章管理</a></li>
+                <li class="layui-this" lay-id="info">编辑文章</li>
+            </ul>
+            <div class="layui-tab-content" style="padding: 20px 0;">
+                <div class="layui-form-pane layui-tab-item layui-show">
+                    <form class="layui-form layui-show" method="post" id="articleForm">
+                        <div class="layui-form-item">
+                            <label for="title" class="layui-form-label">文章标题</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="title" name="title" required lay-verify="required" autocomplete="off" value="<?php echo htmlspecialchars($item['title']);?>" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label for="slug" class="layui-form-label">URL别名</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="slug" name="slug" autocomplete="off" value="<?php echo htmlspecialchars($item['slug']);?>" placeholder="选填" class="layui-input">
+                                <div class="layui-word-aux">可不填，用于SEO友好URL，只能包含字母、数字、连字符，至少包含一个字母</div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-form-text">
+                            <label for="excerpt" class="layui-form-label">文章摘要</label>
+                            <div class="layui-input-block">
+                                <textarea placeholder="文章摘要，用于SEO描述" id="excerpt" name="excerpt" class="layui-textarea" style="height: 80px;"><?php echo htmlspecialchars($item['excerpt']);?></textarea>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">文章内容</label>
+                            <div class="layui-input-block">
+                                <div id="toolbar-container" style="border: 1px solid #ccc; border-bottom: none; background: #fafafa;"></div>
+                                <div id="editor-container" style="border: 1px solid #ccc; border-top: none; min-height: 400px; height: 400px;"></div>
+                                <textarea id="content" name="content" style="display: none;"><?php echo $item['content'];?></textarea>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label for="keywords" class="layui-form-label">SEO关键词</label>
+                            <div class="layui-input-block">
+                                <input type="text" id="keywords" name="keywords" autocomplete="off" value="<?php echo htmlspecialchars($item['keywords']);?>" placeholder="多个关键词用逗号分隔" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-form-text">
+                            <label for="description" class="layui-form-label">SEO描述</label>
+                            <div class="layui-input-block">
+                                <textarea placeholder="SEO元描述" id="description" name="description" class="layui-textarea" style="height: 60px;"><?php echo htmlspecialchars($item['description']);?></textarea>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label">状态</label>
+                                <div class="layui-input-inline">
+                                    <select name="status">
+                                        <option value="0" <?php if($item['status'] == 0):?>selected<?php endif;?>>草稿</option>
+                                        <option value="1" <?php if($item['status'] == 1):?>selected<?php endif;?>>发布</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">排序</label>
+                                <div class="layui-input-inline">
+                                    <input type="number" name="sort" value="<?php echo $item['sort'];?>" placeholder="数字越大越靠前" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item" style="text-align: center;">
+                            <input type="hidden" name="id" value="<?php echo $item['id'];?>">
+                            <input type="hidden" name="method" value="edit">
+                            <button class="layui-btn" lay-submit lay-filter="save">更新文章</button>
+                            <button type="button" class="layui-btn layui-btn-primary" onclick="history.back()">返回</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--引入公共底文件-->
+<?php include ADMIN_COMMON_PATH.'/footer.html';?>
+
+<!-- wangEditor 样式优化 -->
+<style>
+#toolbar-container {
+    border-radius: 2px 2px 0 0;
+}
+
+#editor-container {
+    border-radius: 0 0 2px 2px;
+    background: white;
+}
+
+/* 工具栏样式优化 */
+.w-e-toolbar {
+    padding: 8px !important;
+    background: #fafafa !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+.w-e-toolbar .w-e-bar-item {
+    margin: 2px !important;
+}
+
+.w-e-toolbar .w-e-bar-item button {
+    padding: 5px 8px !important;
+    border-radius: 3px !important;
+    height: 28px !important;
+    line-height: 18px !important;
+}
+
+.w-e-toolbar .w-e-bar-item button:hover {
+    background: #e2e2e2 !important;
+}
+
+.w-e-toolbar .w-e-bar-item button.w-e-bar-item-active {
+    background: #009688 !important;
+    color: white !important;
+}
+
+/* 编辑区域样式 */
+.w-e-text-container {
+    background: white !important;
+}
+
+.w-e-text-placeholder {
+    color: #ccc !important;
+}
+
+/* 分隔线样式 */
+.w-e-toolbar .w-e-bar-divider {
+    border-left: 1px solid #ddd !important;
+    margin: 0 8px !important;
+    height: 20px !important;
+}
+
+/* 确保编辑器高度 */
+.w-e-text-container .w-e-scroll {
+    min-height: 368px !important; 
+    max-height: 368px !important;
+    overflow-y: auto !important;
+}
+
+/* 修复下拉菜单被遮挡的问题 */
+.w-e-drop-panel {
+    z-index: 9999 !important;
+}
+</style>
+
+<!-- wangEditor - 使用多个CDN备选 -->
+<script src="https://unpkg.com/@wangeditor/editor@latest/dist/index.js"></script>
+<script>
+// CDN备选方案
+if (typeof window.wangEditor === 'undefined') {
+    console.log('主CDN加载失败，尝试备选CDN...');
+    document.write('<script src="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/index.min.js"><\/script>');
+}
+</script>
+<script>
+layui.use(['form', 'layer', 'jquery'], function(){
+    var form = layui.form;
+    var layer = layui.layer;
+    var $ = layui.jquery;
+
+    // 检查wangEditor是否加载成功
+    function initEditor() {
+        if (typeof window.wangEditor === 'undefined') {
+            layer.msg('富文本编辑器加载失败，请刷新页面重试', {icon: 2});
+            return;
+        }
+
+        // 创建wangEditor编辑器
+        const { createEditor, createToolbar } = window.wangEditor;
+
+        const editorConfig = {
+            placeholder: '请输入文章内容...',
+            onChange(editor) {
+                const html = editor.getHtml();
+                document.getElementById('content').value = html;
+            },
+            height: 400, // 明确设置编辑器高度
+            MENU_CONF: {
+                // 图片上传配置
+                uploadImage: {
+                    server: '/<?php echo ADMIN_DIR;?>/upload/image',
+                    fieldName: 'file',
+                    maxFileSize: 5 * 1024 * 1024, // 5M
+                    allowedFileTypes: ['image/*'],
+                    timeout: 30 * 1000, // 30秒
+                    withCredentials: true,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    // 上传成功后的回调
+                    onSuccess(file, res) {
+                        console.log('图片上传成功', res);
+                    },
+                    // 上传失败后的回调
+                    onFailed(file, res) {
+                        console.log('图片上传失败', res);
+                        layer.msg('图片上传失败：' + res.message, {icon: 2});
+                    },
+                    // 上传错误的回调
+                    onError(file, err, res) {
+                        console.log('图片上传错误', err, res);
+                        layer.msg('图片上传错误', {icon: 2});
+                    }
+                },
+                // 视频上传配置
+                uploadVideo: {
+                    server: '/<?php echo ADMIN_DIR;?>/upload/video',
+                    fieldName: 'file',
+                    maxFileSize: 50 * 1024 * 1024, // 50M
+                    allowedFileTypes: ['video/*'],
+                    timeout: 60 * 1000, // 60秒
+                    withCredentials: true,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    // 上传成功后的回调
+                    onSuccess(file, res) {
+                        console.log('视频上传成功', res);
+                    },
+                    // 上传失败后的回调
+                    onFailed(file, res) {
+                        console.log('视频上传失败', res);
+                        layer.msg('视频上传失败：' + res.message, {icon: 2});
+                    },
+                    // 上传错误的回调
+                    onError(file, err, res) {
+                        console.log('视频上传错误', err, res);
+                        layer.msg('视频上传错误', {icon: 2});
+                    }
+                }
+            }
+        };
+
+        const editor = createEditor({
+            selector: '#editor-container',
+            html: $('#content').val(),
+            config: editorConfig,
+            mode: 'default'
+        });
+
+        const toolbarConfig = {
+            toolbarKeys: [
+                'headerSelect', 'blockquote',
+                '|',
+                'bold', 'underline', 'italic', 'through', 'code', 'clearStyle',
+                '|', 
+                'color', 'bgColor',
+                '|',
+                'fontSize', 'lineHeight',
+                '|',
+                'bulletedList', 'numberedList',
+                '|',
+                'justifyLeft', 'justifyRight', 'justifyCenter',
+                '|',
+                'insertLink', 'uploadImage', 'uploadVideo', 'insertTable',
+                '|',
+                'undo', 'redo'
+            ]
+        };
+
+        const toolbar = createToolbar({
+            editor,
+            selector: '#toolbar-container',
+            config: toolbarConfig,
+            mode: 'default'
+        });
+
+        // 表单提交
+        form.on('submit(save)', function(data){
+            var content = editor.getHtml();
+            if (!content || content.trim() === '<p><br></p>') {
+                layer.msg('请输入文章内容', {icon: 2});
+                return false;
+            }
+            
+            data.field.content = content;
+            
+            layer.load(2);
+            $.post('/<?php echo ADMIN_DIR;?>/article/save/', data.field, function(res){
+                layer.closeAll('loading');
+                if (res.code == 1) {
+                    layer.msg(res.msg, {icon: 1}, function(){
+                        location.href = '/<?php echo ADMIN_DIR;?>/article/';
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            }, 'json');
+            
+            return false;
+        });
+
+        // 在页面卸载前销毁编辑器
+        window.addEventListener('beforeunload', function() {
+            if (editor) {
+                editor.destroy();
+            }
+            if (toolbar) {
+                toolbar.destroy();
+            }
+        });
+    }
+
+    // 延迟初始化编辑器，确保wangEditor已加载
+    setTimeout(initEditor, 500);
+});
+</script>

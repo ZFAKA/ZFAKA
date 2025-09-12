@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html<?php if(isset($config['backgroundimage']) AND strlen($config['backgroundimage'])>0):?> style="background-size: cover; background-image: url(<?php echo $config['backgroundimage'];?>); background-attachment: fixed;"<?php endif;?> lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title><?php echo htmlspecialchars($seo['title']);?></title>
+    <meta name="keywords" content="<?php echo htmlspecialchars($seo['keywords']);?>">
+    <meta name="description" content="<?php echo htmlspecialchars($seo['description']);?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/res/layui/css/layui.css">
+    <link rel="stylesheet" href="/res/css/global.css">
+    <?php if(isset($config['shortcuticon']) AND strlen($config['shortcuticon'])>0):?>
+	<link rel="shortcut icon" href="<?php echo $config['shortcuticon'];?>" /> 
+	<?php else:?>
+	<link rel="shortcut icon" href="/favicon.ico" /> 
+	<?php endif;?>
+    <style>
+        body { 
+            background-color: transparent;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .article-container { 
+            max-width: 800px; 
+            width: 100%;
+            margin: 20px 0; 
+            background: rgba(255, 255, 255, 0.85); 
+            padding: 30px; 
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(5px);
+        }
+        .article-title { 
+            font-size: 28px; 
+            font-weight: bold; 
+            color: #333; 
+            margin-bottom: 20px;
+            line-height: 1.4;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+        .article-meta { 
+            color: #666; 
+            font-size: 14px; 
+            margin-bottom: 30px; 
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .article-content { 
+            line-height: 1.8; 
+            font-size: 16px; 
+            color: #333;
+        }
+        .article-content img { 
+            max-width: 100%; 
+            height: auto; 
+            margin: 15px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .article-content p { 
+            margin-bottom: 16px; 
+        }
+        .article-content h1, 
+        .article-content h2, 
+        .article-content h3 { 
+            margin: 25px 0 15px 0; 
+            color: #2d2d2d;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+        .back-home {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .article-excerpt {
+            font-size: 14px;
+            background: rgba(248, 249, 250, 0.7);
+            padding: 15px;
+            border-left: 4px solid #009688;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #555;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .article-container {
+                padding: 20px 15px;
+            }
+            
+            .article-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body id="zlkbbody">
+    <div class="fly-header <?php if(isset($config['headermenucolor']) AND strlen($config['headermenucolor'])>0):?><?php echo $config['headermenucolor'];?><?php else:?>layui-bg-black<?php endif;?>">
+        <div class="layui-container">
+             <div class=""><a class="fly-logo" href="/"><img src="<?php if(isset($config['logo']) AND strlen($config['logo'])>0):?><?php echo $config['logo'];?><?php else:?>/res/images/logo.png<?php endif;?>" alt="zfaka"></a></div>
+            <ul class="layui-nav fly-nav" id="webmenu">
+				<li></li>
+                <?php if($login):?>
+                <li class="layui-nav-item layui-hide-xs">
+                    <a href="/member">我的账户</a>
+                </li>
+                <li class="layui-nav-item layui-hide-xs">
+                    <a href="/product">购买商品</a>
+                </li>
+                <li class="layui-nav-item layui-hide-xs">
+                    <a href="/member/help">帮助中心</a>
+                </li>
+                <li class="layui-nav-item layui-hide-xs">
+                    <a href="/articles">文章列表</a>
+                </li>
+                <?php else:?>
+                <li class="layui-nav-item layui-hide-xs">
+                    <a href="/product">购买商品</a>
+                </li>
+                <li class="layui-nav-item layui-hide-xs">
+                    <a href="/product/query">查询订单</a>
+                </li>
+                <li class="layui-nav-item layui-hide-xs">
+                    <a href="/articles">文章列表</a>
+                </li>
+                <?php endif;?>
+            </ul>
+			
+			<ul class="layui-nav fly-nav-user">
+				<li class="layui-nav-item layui-hide-lg layui-hide-md layui-hide-sm layadmin-flexible">
+					<a href="javascript:;" title="侧边伸缩">
+					<i class="layui-icon layui-icon-spread-left" id="main-menu-mobile-switch" style="font-size: 16px;"></i>
+					</a>
+				</li>
+			 </ul>
+			 
+            <ul class="layui-nav fly-nav-user layui-hide-xs">
+                <?php if($login):?>
+                <li class="layui-nav-item">
+                    <a class="fly-nav-avatar" href="javascript:;">
+                        <cite class="layui-hide-xs">
+                            <?php echo $uinfo['nickname'];?>
+                        </cite>
+                        <i class="iconfont icon-renzheng layui-hide-xs" title="<?php echo $uinfo['nickname'];?>"></i>
+                        <i class="layui-badge fly-badge-vip layui-hide-xs"><?php echo $uinfo['groupName'];?></i>
+                        <img src="/res/images/avatar/<?php echo rand(0,11);?>.jpg">
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="/member/profiles/">基本设置</a></dd>
+                        <dd><a href="/member/logger">我的日志</a></dd>
+                        <dd><a href="/member/">我的主页</a></dd>
+                        <hr style="margin: 5px 0;">
+                        <dd><a href="/member/logout/" style="text-align: center;">退出</a></dd>
+                    </dl>
+                </li>
+                <?php else:?>
+					<?php if(isset($config['loginswitch']) AND $config['loginswitch']>0):?>
+					<!-- 未登录的状态 -->
+					<li class="layui-nav-item">
+						<a class="iconfont icon-touxiang layui-hide-xs" href="/member/login/"></a>
+					</li>
+					<li class="layui-nav-item">
+						<a href="/member/login/">登录</a>
+					</li>
+					<?php endif;?>
+					<?php if(isset($config['registerswitch']) AND $config['registerswitch']>0):?>
+					<li class="layui-nav-item">
+						<a href="/member/register/">注册</a>
+					</li>
+					<?php endif;?>
+                <?php endif;?>
+            </ul>
+        </div>
+    </div>
+    <div class="article-container">
+        <h1 class="article-title">
+            <?php echo htmlspecialchars($article['title']);?>
+        </h1>
+        
+        <div class="article-meta">
+            <span><i class="layui-icon layui-icon-time"></i> 发布时间：<?php echo date('Y-m-d H:i:s', $article['created_at']);?></span>
+            <span style="margin-left: 20px;"><i class="layui-icon layui-icon-eye"></i> 阅读量：<?php echo $article['views'];?></span>
+            <?php if($article['updated_at'] > $article['created_at']):?>
+            <span style="margin-left: 20px;"><i class="layui-icon layui-icon-edit"></i> 更新时间：<?php echo date('Y-m-d H:i:s', $article['updated_at']);?></span>
+            <?php endif;?>
+        </div>
+
+        <?php if($article['excerpt']):?>
+        <h2 class="article-excerpt">
+            <strong>摘要：</strong><?php echo htmlspecialchars($article['excerpt']);?>
+        </h2>
+        <?php endif;?>
+        
+        <div class="article-content">
+            <?php echo $article['content'];?>
+        </div>
+
+        <div class="back-home">
+            <a href="/" class="layui-btn layui-btn-primary">
+                <i class="layui-icon layui-icon-home"></i> 返回首页
+            </a>
+        </div>
+    </div>
+
+    <!-- 移动端遮罩层 -->
+    <div class="site-mobile-shade"></div>
+
+    <!-- 引入layui JS -->
+    <script src="/res/layui/layui.js"></script>
+    <script type="text/javascript">
+	    function setClassName() {
+	    	var menuChild = document.getElementById('webmenu').childNodes,
+	    		aName = window.location.pathname,
+	    		aMenu = [];
+	    	for (var i = 0, j = menuChild.length; i < j; i++) {
+	    		if (menuChild[i].nodeType != 3) {
+	    			aMenu.push(menuChild[i]);
+	    		}
+	    	}
+	    	<?php if($login):?>
+	    	if (aName.indexOf('/member') == 0) {
+	    		aMenu[1].className += ' layui-this';
+	    	} else if (aName.indexOf('/product') > -1 || aName.indexOf('/group') > -1) {
+	    		aMenu[2].className += ' layui-this';
+	    	} else if (aName.indexOf('/help') > -1) {
+	    		aMenu[3].className += ' layui-this';
+	    	} else if (aName.indexOf('/article') > -1) {
+	    		aMenu[4].className += ' layui-this';
+	    	}
+	    	<?php else:?>
+	    	if (aName.indexOf('/product/query') > -1) {
+	    		aMenu[2].className += ' layui-this';
+	    	} else if (aName.indexOf('/product') > -1 || aName.indexOf('/group') > -1) {
+	    		aMenu[1].className += ' layui-this';
+	    	} else if (aName.indexOf('/article') > -1) {
+	    		aMenu[3].className += ' layui-this';
+	    	}
+	    	<?php endif;?>
+	    }
+	    setClassName();
+
+        // 移动端菜单功能
+        layui.use(['element'], function(){
+            var element = layui.element;
+            
+            // 移动端菜单切换
+            var menuSwitch = document.getElementById('main-menu-mobile-switch');
+            if(menuSwitch) {
+                menuSwitch.onclick = function(){
+                    var mobileMenu = document.getElementById('main-menu-mobile');
+                    var shade = document.querySelector('.site-mobile-shade');
+                    
+                    if(mobileMenu.style.display === 'block'){
+                        mobileMenu.style.display = 'none';
+                        shade.style.display = 'none';
+                    } else {
+                        mobileMenu.style.display = 'block';
+                        shade.style.display = 'block';
+                    }
+                };
+            }
+            
+            // 点击遮罩层关闭菜单
+            var shade = document.querySelector('.site-mobile-shade');
+            if(shade) {
+                shade.onclick = function(){
+                    document.getElementById('main-menu-mobile').style.display = 'none';
+                    this.style.display = 'none';
+                };
+            }
+        });
+	</script>
+    <!-- 移动端菜单样式 -->
+    <style>
+    #main-menu-mobile {
+        position: fixed !important;
+        top: 60px !important; /* 调整到头部导航下方 */
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 19891016 !important;
+    }
+    .site-mobile-shade {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 19891015;
+        display: none;
+    }
+    </style>
+
+    <ul class="layui-nav layui-nav-tree layui-inline" lay-filter="main-menu" id="main-menu-mobile" style="display: none;">
+      <li class="layui-nav-item layui-nav-itemed">
+        <a href="javascript:;">主菜单</a>
+        <dl class="layui-nav-child">
+    		<?php if($login):?>
+    		<dd><a href="/member/">我的账户</a></dd>
+    		<dd><a href="/product">购买商品</a></dd>
+            <dd><a href="/articles">文章列表</a></dd>
+    		<dd><a href="/help">帮助中心</a></dd>
+    		<dd><a href="/member/logout/">退出</a></dd>
+    		<?php else:?>
+    		<dd><a href="/product/">购买商品</a></dd>
+    		<dd><a href="/product/query">查询订单</a></dd>
+            <dd><a href="/articles">文章列表</a></dd>
+    		<?php if(isset($config['loginswitch']) AND $config['loginswitch']>0):?><dd><a href="/member/login/">登录</a></dd><?php endif;?>
+    		<?php if(isset($config['registerswitch']) AND $config['registerswitch']>0):?> <dd><a href="/member/register/">注册</a></dd><?php endif;?>
+    		<?php endif;?>
+        </dl>
+      </li>
+    </ul>
+</body>
+</html>
