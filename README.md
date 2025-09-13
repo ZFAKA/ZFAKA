@@ -1,3 +1,12 @@
+<p align="center">
+  <img width="455" height="116" alt="new_logo" src="https://github.com/user-attachments/assets/56c6e3ff-2e89-4996-b9f7-55fb0aef9ed9" />
+</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-blue">
+  <img src="https://img.shields.io/badge/version-1.4.6-red">
+  <img src="https://img.shields.io/badge/PHP-7.x-grey">
+</p>
+
 # ZFAKA发卡系统(本系统基于yaf+layui开发)
 
 >**郑重申明：本项目为开源程序，仅做技术交流使用**
@@ -5,6 +14,24 @@
 演示地址：https://zk-cash.com/  
 永久免费、绝对开源，欢迎提供各种需求和意见与建议。  
 1.4.5版本中存在的漏洞已修复，可放心使用  
+
+# 模板展示
+
+模板1
+
+<img width="800" alt="template1" src="https://github.com/user-attachments/assets/58fe1d1a-8bb0-4b80-8c4d-e9078d6cd1ca" />
+
+模板2
+
+<img width="800" alt="template2" src="https://github.com/user-attachments/assets/267e960a-2ea7-4114-a402-756965262a15" />
+
+模板3
+
+<img width="800" alt="template3" src="https://github.com/user-attachments/assets/a58a11cc-b96d-4164-8bf0-222177c33b84" />
+
+# 文章页面
+
+<img width="800" alt="article1" src="https://github.com/user-attachments/assets/109985da-554a-4c8b-9bc4-ed80960e4b29" />
 
 # 系统优势  
 * SEO优化：新增文章模块  
