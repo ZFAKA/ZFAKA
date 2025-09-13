@@ -108,6 +108,9 @@
                     <a href="/articles">文章列表</a>
                 </li>
                 <?php endif;?>
+                <li class="layui-nav-item layui-hide-xs">
+                    <a href="/about">关于我们</a>
+                </li>
             </ul>
 			
 			<ul class="layui-nav fly-nav-user">
@@ -324,6 +327,7 @@
     		<?php if(isset($config['loginswitch']) AND $config['loginswitch']>0):?><dd><a href="/member/login/">登录</a></dd><?php endif;?>
     		<?php if(isset($config['registerswitch']) AND $config['registerswitch']>0):?> <dd><a href="/member/register/">注册</a></dd><?php endif;?>
     		<?php endif;?>
+            <dd><a href="/about">关于我们</a></dd>
         </dl>
       </li>
     </ul>

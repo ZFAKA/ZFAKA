@@ -70,6 +70,37 @@
             color: #2d2d2d;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
         }
+        .article-content ul, 
+        .article-content ol {
+            all: revert;
+            margin: 16px 0 16px 24px;
+            padding-left: 20px;
+        }
+
+        .article-content ul {
+            all: revert;
+            list-style-type: disc;
+        }
+
+        .article-content ol {
+            all: revert;
+            list-style-type: decimal;
+        }
+
+        .article-content li {
+            all: revert;
+            margin: 6px 0;
+            line-height: 1.7;
+        }
+
+        .article-content code {
+            background: rgba(27,31,35,.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 14px;
+            color: #e83e8c;
+        }
         .back-home {
             text-align: center;
             margin-top: 40px;
@@ -133,6 +164,9 @@
                     <a href="/articles">文章列表</a>
                 </li>
                 <?php endif;?>
+                <li class="layui-nav-item layui-hide-xs">
+                    <a href="/about">关于我们</a>
+                </li>
             </ul>
 			
 			<ul class="layui-nav fly-nav-user">
@@ -316,6 +350,7 @@
     		<?php if(isset($config['loginswitch']) AND $config['loginswitch']>0):?><dd><a href="/member/login/">登录</a></dd><?php endif;?>
     		<?php if(isset($config['registerswitch']) AND $config['registerswitch']>0):?> <dd><a href="/member/register/">注册</a></dd><?php endif;?>
     		<?php endif;?>
+            <dd><a href="/about">关于我们</a></dd>
         </dl>
       </li>
     </ul>
