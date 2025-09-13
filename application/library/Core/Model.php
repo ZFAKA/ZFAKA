@@ -4,6 +4,7 @@
  * Functionality: Core PDO model class(再整理)
  * Author: 资料空白
  * Date: 2018-6-8
+ * Security Update: 2025-08-05 - Added SQL injection protection
  */
 abstract class Model {
 
@@ -99,6 +100,23 @@ abstract class Model {
 	}
 
 	/**
+	 * ✅ SECURITY FIX: Escape values for SQL injection protection
+	 */
+	private function escapeValue($value) {
+		// Ensure connection is available
+		if (self::$conn === null) {
+			$this->connect();
+		}
+		
+		if (self::$conn !== null) {
+			return self::$conn->quote($value);
+		}
+		
+		// Fallback if connection fails
+		return "'" . addslashes($value) . "'";
+	}
+
+	/**
 	 * Field
 	 */
 	final public function Field($field){
@@ -128,9 +146,10 @@ abstract class Model {
 
 	/**
 	 * Between 支持多次调用
+	 * ✅ SECURITY FIX: Added escaping
 	 */
 	final public function Between($key, $start, $end){
-		$str = '`'.$key.'` BETWEEN "'.$start.'" AND "'.$end.'"';
+		$str = '`'.$key.'` BETWEEN '.$this->escapeValue($start).' AND '.$this->escapeValue($end);
 		if(isset($this->options['between'])){
 			$this->options['between'] .= ' AND '.$str;
 		}else{
@@ -154,6 +173,7 @@ abstract class Model {
 	/**
 	 * Where 支持多次调用
 	 * where 有三种调用方式
+	 * ✅ SECURITY FIX: Added proper escaping
 	 */
 	final public function Where($where, $condition = '', $value = ''){
 		if(!$where){
@@ -166,7 +186,7 @@ abstract class Model {
 			$i   = 1;
 			$str = '';
 			foreach($where as $key => $val){
-				$str .= '`'.$key.'` = "'.$val.'"';
+				$str .= '`'.$key.'` = '.$this->escapeValue($val);  // ✅ SECURE
 				if($i != $total){
 					$str .= ' AND ';
 				}
@@ -177,7 +197,7 @@ abstract class Model {
 			// $condition 可为 =, !=, >, >=, <, <=, IN, NOT IN, LIKE, NOT LIKE
 			if($condition){
 				// 此时的 $where 变成了表字段
-				$str .= ' `'.$where.'`'.' '.$condition.' ';
+				$str = ' `'.$where.'`'.' '.$condition.' ';
 
 				// 是否是 IN, NOT IN, 是则值带上 (), 支持数组或字符串
 				if(stripos($condition, 'IN') !== FALSE){
@@ -185,7 +205,7 @@ abstract class Model {
 					if(is_array($value)){
 						$str .= '(';
 						foreach($value as $v){
-							$str .= '"'.$v.'",';
+							$str .= $this->escapeValue($v).',';  // ✅ SECURE
 						}
 
 						// 去掉,
@@ -198,10 +218,10 @@ abstract class Model {
 					}
 				}else if(stripos($condition, 'LIKE') !== FALSE){
 					// 是否是 LIKE, NOT LIKE
-					$str .= '"%'.$value.'%"';
+					$str .= $this->escapeValue('%'.$value.'%');  // ✅ SECURE
 				}else{
 					// =, !=, >, >=, <, <= 等形式
-					$str .= '"'.$value.'"';
+					$str .= $this->escapeValue($value);  // ✅ SECURE
 				}
 			}else{
 				// 3: $where = 'username != "yaf"'; 这样的字符串形式
@@ -325,6 +345,7 @@ abstract class Model {
 
 	/**
 	 * Insert | Add a new record
+	 * ✅ SECURITY FIX: Added proper escaping
 	 *
 	 * @param Array => Array('field1'=>'value1', 'field2'=>'value2', 'field3'=>'value1')
 	 * @return FALSE on failure or inserted_id on success
@@ -337,7 +358,7 @@ abstract class Model {
 
 			foreach ($map as $key => $value) {
 				$fields[] = '`' . $key . '`';
-				$values[] = "'$value'";
+				$values[] = $this->escapeValue($value);  // ✅ SECURE
 			}
 
 			$fieldString = implode(',', $fields);
@@ -355,6 +376,7 @@ abstract class Model {
 
 	/**
 	 * Insert | Add a list record
+	 * ✅ SECURITY FIX: Added proper escaping
 	 *
 	 * @param type $data
 	 * @return boolean
@@ -377,7 +399,11 @@ abstract class Model {
 				$first = FALSE;
 			}
 
-			$tmp = implode('\',\'', $item);
+			$escapedValues = array();
+			foreach($item as $value) {
+				$escapedValues[] = trim($this->escapeValue($value), "'");  // ✅ SECURE
+			}
+			$tmp = implode("','", $escapedValues);
 			$tmp = "('$tmp')";
 			$sqlValueArr[] = $tmp;
 		}
@@ -394,6 +420,7 @@ abstract class Model {
 
 	/**
 	 * Replace | Add a new record if not exit, update if exits;
+	 * ✅ SECURITY FIX: Added proper escaping
 	 *
 	 * @param Array => Array('field1'=>'value1', 'field2'=>'value2', 'field3'=>'value1')
 	 * @return FALSE on failure or inserted_id on success
@@ -406,7 +433,7 @@ abstract class Model {
 
 			foreach ($map as $key => $value) {
 				$fields[] = '`' . $key . '`';
-				$values[] = "'$value'";
+				$values[] = $this->escapeValue($value);  // ✅ SECURE
 			}
 
 			$fieldString = implode(',', $fields);
@@ -561,6 +588,7 @@ abstract class Model {
 
 	/**
 	 * Update record(s)
+	 * ✅ SECURITY FIX: Added proper escaping
 	 *
 	 * @param array  => $map = array('field1'=>value1, 'field2'=>value2, 'field3'=>value3))
 	 * @param boolean $self => self field ?
@@ -580,17 +608,17 @@ abstract class Model {
 				foreach ($map as $key => $value) {
 					if (strpos($value, '+') !== FALSE) {
 						list($flag, $v) = explode('+', $value);
-						$sets[] = "`$key` = `$key` + '$v'";
+						$sets[] = "`$key` = `$key` + " . $this->escapeValue($v);  // ✅ SECURE
 					} elseif (strpos($value, '-') !== FALSE) {
 						list($flag, $v) = explode('-', $value);
-						$sets[] = "`$key` = `$key` - '$v'";
+						$sets[] = "`$key` = `$key` - " . $this->escapeValue($v);  // ✅ SECURE
 					} else {
-						$sets[] = "`$key` = '$value'";
+						$sets[] = "`$key` = " . $this->escapeValue($value);  // ✅ SECURE
 					}
 				}
 			} else {
 				foreach ($map as $key => $value) {
-					$sets[] = "`$key` = '$value'";
+					$sets[] = "`$key` = " . $this->escapeValue($value);  // ✅ SECURE
 				}
 			}
 
