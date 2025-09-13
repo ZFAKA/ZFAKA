@@ -3,52 +3,16 @@ DELETE FROM `t_payment` WHERE `alias` IN ('codepayalipay', 'codepayqq', 'codepay
 
 -- 更新支付方式数据
 UPDATE `t_payment` SET 
-  `payment` = '支付宝电脑网站支付(WEB)',
-  `payname` = '支付宝',
-  `payimage` = '/res/images/pay/alipay.jpg',
-  `alias` = 'zfbweb',
-  `sign_type` = 'RSA2',
-  `app_id` = '2018********',
-  `app_secret` = '',
-  `ali_public_key` = '',
-  `rsa_private_key` = '',
-  `configure3` = '',
-  `configure4` = '',
-  `overtime` = 0,
-  `active` = 0
-WHERE `id` = 2;
+  `id` = 2
+WHERE `payment` = '支付宝电脑网站支付(WEB)';
 
 UPDATE `t_payment` SET 
-  `payment` = '微信扫码支付',
-  `payname` = '微信',
-  `payimage` = '/res/images/pay/weixin.jpg',
-  `alias` = 'wxf2f',
-  `sign_type` = 'MD5',
-  `app_id` = '',
-  `app_secret` = '',
-  `ali_public_key` = '',
-  `rsa_private_key` = '',
-  `configure3` = '',
-  `configure4` = '',
-  `overtime` = 0,
-  `active` = 0
-WHERE `id` = 3;
+  `id` = 3
+WHERE `payment` = '微信扫码支付';
 
 UPDATE `t_payment` SET 
-  `payment` = '微信H5支付',
-  `payname` = '微信',
-  `payimage` = '/res/images/pay/weixin.jpg',
-  `alias` = 'wxh5',
-  `sign_type` = 'MD5',
-  `app_id` = '',
-  `app_secret` = '',
-  `ali_public_key` = '',
-  `rsa_private_key` = '',
-  `configure3` = '',
-  `configure4` = '',
-  `overtime` = 0,
-  `active` = 0
-WHERE `id` = 4;
+  `id` = 4
+WHERE `payment` = '微信H5支付';
 
 UPDATE `t_payment` SET 
   `payment` = 'PAYPAL',

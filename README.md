@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/PHP-7.x-grey">
 </p>
 
-# ZFAKA发卡系统(本系统基于yaf+layui开发)
+# ZFAKA自动售货系统
 
 >**郑重申明：本项目为开源程序，仅做技术交流使用**
 
