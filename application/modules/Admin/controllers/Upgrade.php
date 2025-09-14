@@ -45,12 +45,12 @@ class UpgradeController extends AdminBasicController
                 $version = @file_get_contents(INSTALL_LOCK);
                 $version = str_replace(array("\r", "\n", "\t"), "", $version);
                 $version = strlen(trim($version)) > 0 ? trim($version) : '1.0.0';
-				file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "当前安装记录版本: {$version} ". "当前系统版本: ".VERSION."\n", FILE_APPEND);
+                file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "当前安装记录版本: {$version} " . "当前系统版本: " . VERSION . "\n", FILE_APPEND);
 
                 // 若安装记录版本 < 常量 VERSION，则跳转到安装/升级向导（保留原行为）
                 if (version_compare($this->normalizeVersion($version), $this->normalizeVersion(VERSION), '<')) {
                     $this->redirect("/install/upgrade");
-					file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "跳转到安装/升级向导\n", FILE_APPEND);
+                    file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "跳转到安装/升级向导\n", FILE_APPEND);
                     return FALSE;
                 } else {
                     // 获取会话缓存的 up_version
@@ -62,7 +62,7 @@ class UpgradeController extends AdminBasicController
 
                     // 比较当前代码的 VERSION 与 远程 up_version
                     if (version_compare($this->normalizeVersion(VERSION), $this->normalizeVersion($up_version), '<')) {
-						file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "检测到新版本: {$up_version}\n", FILE_APPEND);
+                        file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "检测到新版本: {$up_version}\n", FILE_APPEND);
                         $zipUrl = sprintf($this->zip_template, $up_version);
                         $data = array(
                             'url' => $this->github_api,
@@ -109,7 +109,7 @@ class UpgradeController extends AdminBasicController
                     $gitZipUrl = sprintf($this->zip_template, $up_version);
                     try {
                         $localZip = $this->_download($gitZipUrl, TEMP_PATH);
-						file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "从 GitHub 下载更新包成功: {$gitZipUrl}\n", FILE_APPEND);
+                        file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "从 GitHub 下载更新包成功: {$gitZipUrl}\n", FILE_APPEND);
                     } catch (\Exception $e) {
                         $localZip = false;
                     }
@@ -119,9 +119,9 @@ class UpgradeController extends AdminBasicController
                         $fallbackUrl = rtrim($this->fallback_base, '/') . $this->fallback_zip_file;
                         try {
                             $localZip = $this->_download($fallbackUrl, TEMP_PATH);
-							file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "从备用源下载更新包成功: {$fallbackUrl}\n", FILE_APPEND);
+                            file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "从备用源下载更新包成功: {$fallbackUrl}\n", FILE_APPEND);
                         } catch (\Exception $e) {
-							file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "从备用源下载更新包失败: {$e->getMessage()}\n", FILE_APPEND);
+                            file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "从备用源下载更新包失败: {$e->getMessage()}\n", FILE_APPEND);
                             throw new \Exception('下载失败：GitHub 与备用源均不可用. ' . $e->getMessage());
                         }
                     }
@@ -136,30 +136,84 @@ class UpgradeController extends AdminBasicController
                             @mkdir($extractDir, 0755, true);
                         }
                         $unzipOk = $this->_unzip($localZip, $extractDir);
-						file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "解压更新包到 {$extractDir} " . ($unzipOk ? "成功" : "失败") . "\n", FILE_APPEND);
+                        file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "解压更新包到 {$extractDir} " . ($unzipOk ? "成功" : "失败") . "\n", FILE_APPEND);
                         if ($unzipOk) {
-							file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "开始备份当前项目到 " . rtrim(TEMP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'backup备份.zip' . "\n", FILE_APPEND);
+                            file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "开始备份当前项目到 " . rtrim(TEMP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'backup备份.zip' . "\n", FILE_APPEND);
                             // === 新增：先备份当前 APP_PATH 到 TEMP_PATH/backup备份.zip ===
                             $backupZip = rtrim(TEMP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'backup备份.zip';
                             // 若已存在同名备份，先删除
                             if (file_exists($backupZip)) {
-								file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "发现已有备份文件，先删除\n", FILE_APPEND);
+                                file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "发现已有备份文件，先删除\n", FILE_APPEND);
                                 @unlink($backupZip);
                             }
                             $zipOk = $this->_zipDirectory(APP_PATH, $backupZip);
                             if ($zipOk !== true) {
-								file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "备份当前项目失败\n", FILE_APPEND);
+                                file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "备份当前项目失败\n", FILE_APPEND);
                                 throw new \Exception('备份失败：无法打包当前项目到 ' . $backupZip);
                             }
-							file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "备份当前项目到 {$backupZip} 成功\n", FILE_APPEND);
+                            file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "备份当前项目到 {$backupZip} 成功\n", FILE_APPEND);
                             // === 备份完成，继续覆盖 ===
 
                             // 保存管理员目录名
                             $admin_dir = ADMIN_DIR;
 
+                            // ====== special: 保存原始 application/init.php 内容（如果存在），以便保留其它内容只更新 VERSION 行 ======
+                            $initPath = rtrim(APP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'init.php';
+                            $origInitContent = null;
+                            if (is_file($initPath) && is_readable($initPath)) {
+                                $origInitContent = @file_get_contents($initPath);
+                                file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "读取原始 init.php 内容\n", FILE_APPEND);
+                            }
+
                             // 覆盖核心文件（把解压后的 ZFAKA-main 覆盖到 APP_PATH）
                             xCopy($extractDir . '/ZFAKA-main', APP_PATH, 1);
-							file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "覆盖核心文件完成\n", FILE_APPEND);
+                            file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "覆盖核心文件完成\n", FILE_APPEND);
+
+							// 处理 init.php 特殊逻辑
+							$localInit = APP_PATH . '/application/init.php';
+							$newInit   = $extractDir . '/ZFAKA-main/application/init.php';
+							$this->_mergeInitFile($localInit, $newInit);
+
+                            // ====== special: 恢复原始 init.php 内容并只替换 VERSION 行为新版本（若原始存在） ======
+                            $newVer = $this->normalizeVersion($up_version);
+                            if ($origInitContent !== null) {
+                                // 替换 define('VERSION', '...') 的值
+                                $pattern = "/define\\s*\\(\\s*'VERSION'\\s*,\\s*'[^']*'\\s*\\)/";
+                                if (preg_match($pattern, $origInitContent)) {
+                                    $replacement = "define('VERSION', '" . $newVer . "')";
+                                    $updated = preg_replace($pattern, $replacement, $origInitContent, 1);
+                                } else {
+                                    // 未找到 define，则尝试在 <?php 后插入
+                                    if (preg_match('/<\\?php\\s*/i', $origInitContent)) {
+                                        $updated = preg_replace('/(<\\?php\\s*)/i', "$1" . "define('VERSION', '" . $newVer . "');\n", $origInitContent, 1);
+                                    } else {
+                                        // 兜底：追加到文件末尾
+                                        $updated = $origInitContent . "\n" . "define('VERSION', '" . $newVer . "');\n";
+                                    }
+                                }
+                                @file_put_contents($initPath, $updated);
+                                file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "恢复 init.php 并更新 VERSION 为 {$newVer}\n", FILE_APPEND);
+                            } else {
+                                // 若没有原始文件，但复制后存在一个 init.php，则在复制后的文件上替换或插入 VERSION
+                                if (is_file($initPath) && is_readable($initPath)) {
+                                    $copied = @file_get_contents($initPath);
+                                    if ($copied !== false) {
+                                        $pattern = "/define\\s*\\(\\s*'VERSION'\\s*,\\s*'[^']*'\\s*\\)/";
+                                        if (preg_match($pattern, $copied)) {
+                                            $replacement = "define('VERSION', '" . $newVer . "')";
+                                            $updated = preg_replace($pattern, $replacement, $copied, 1);
+                                        } else {
+                                            if (preg_match('/<\\?php\\s*/i', $copied)) {
+                                                $updated = preg_replace('/(<\\?php\\s*)/i', "$1" . "define('VERSION', '" . $newVer . "');\n", $copied, 1);
+                                            } else {
+                                                $updated = $copied . "\n" . "define('VERSION', '" . $newVer . "');\n";
+                                            }
+                                        }
+                                        @file_put_contents($initPath, $updated);
+                                        file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "复制后的 init.php 已更新 VERSION 为 {$newVer}\n", FILE_APPEND);
+                                    }
+                                }
+                            }
 
                             // 单独处理 Admin 覆盖（包内的 Admin 覆盖到实际 ADMIN_DIR）
                             $pkgAdminCandidates = array(
@@ -167,19 +221,26 @@ class UpgradeController extends AdminBasicController
                                 $extractDir . '/application/modules/Admin',
                             );
                             $targetAdmin = rtrim(APP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . $admin_dir;
-							file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "覆盖管理员目录 {$targetAdmin}\n", FILE_APPEND);
+                            file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "覆盖管理员目录 {$targetAdmin}\n", FILE_APPEND);
                             foreach ($pkgAdminCandidates as $pkgAdmin) {
-								file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "尝试覆盖源 {$pkgAdmin}\n", FILE_APPEND);
+                                file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "尝试覆盖源 {$pkgAdmin}\n", FILE_APPEND);
                                 if (is_dir($pkgAdmin)) {
-									file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "找到管理员源，开始覆盖\n", FILE_APPEND);
+                                    file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "找到管理员源，开始覆盖并移动（复制后删除源）\n", FILE_APPEND);
                                     if (!is_dir(dirname($targetAdmin))) {
                                         @mkdir(dirname($targetAdmin), 0755, true);
                                     }
+                                    // 先复制
                                     xCopy($pkgAdmin, $targetAdmin, 1);
+                                    // 复制成功后删除包内的 Admin 源（达到“移动”的效果）
+                                    if (is_dir($pkgAdmin)) {
+                                        delDir($pkgAdmin);
+                                        file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "已删除包内管理员源: {$pkgAdmin}\n", FILE_APPEND);
+                                    }
                                     break;
                                 }
                             }
-							file_put_contents(UPGRADE_FILE, CUR_DATETIME.'-' . "覆盖完成，当前版本已更新到 {$up_version}\n", FILE_APPEND);
+
+                            file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "覆盖完成，当前版本已更新到 {$up_version}\n", FILE_APPEND);
                             $data = array('code' => 1, 'msg' => 'ok');
                         } else {
                             $data = array('code' => 1000, 'msg' => '解压失败');
@@ -192,6 +253,7 @@ class UpgradeController extends AdminBasicController
                 }
             } catch (\Exception $e) {
                 $data = array('code' => 1000, 'msg' => '更新失败: ' . $e->getMessage());
+                file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "更新异常: " . $e->getMessage() . "\n", FILE_APPEND);
             } finally {
                 // 统一清理下载文件与解压目录（备份文件保留）
                 if ($localZip && file_exists($localZip)) {
@@ -386,109 +448,140 @@ class UpgradeController extends AdminBasicController
      * 返回 true 表示成功，false 或抛异常表示失败
      */
     private function _zipDirectory($source, $destination)
+    {
+        if (!extension_loaded('zip')) {
+            file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-zip 扩展不可用\n", FILE_APPEND);
+            return false;
+        }
+        if (!file_exists($source)) {
+            file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-源目录不存在: {$source}\n", FILE_APPEND);
+            return false;
+        }
+
+        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-打包目录 {$source} 到 {$destination}\n", FILE_APPEND);
+
+        // 删除同名目标，防止 open 失败
+        if (file_exists($destination)) {
+            file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-发现已有同名打包文件，先删除 {$destination}\n", FILE_APPEND);
+            @unlink($destination);
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($destination, ZipArchive::CREATE) !== TRUE) {
+            file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-无法创建打包文件 {$destination}\n", FILE_APPEND);
+            return false;
+        }
+
+        $sourceReal = realpath($source);
+        if ($sourceReal === false) {
+            file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-无法解析源目录 realpath({$source})\n", FILE_APPEND);
+            $zip->close();
+            return false;
+        }
+
+        // 检查目标 zip 是否在源目录下（若是则在遍历时排除该文件）
+        $realDest = realpath(dirname($destination));
+        $destInSource = ($realDest !== false && strpos($realDest . '/', $sourceReal . '/') === 0);
+
+        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-开始打包目录 {$sourceReal} 到 {$destination}\n", FILE_APPEND);
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sourceReal, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($iterator as $file) {
+            $name = $file->getPathname();
+            file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-处理文件 {$name}\n", FILE_APPEND);
+
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                if ($filePath === false) {
+                    file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-无法解析文件真实路径，跳过: {$name}\n", FILE_APPEND);
+                    continue;
+                }
+
+                // 排除目标 zip 本身（避免自包含）
+                if ($destInSource && realpath($destination) && $filePath === realpath($destination)) {
+                    file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-跳过目标 zip 自包含文件: {$filePath}\n", FILE_APPEND);
+                    continue;
+                }
+
+                // 跳过不可读文件
+                if (!is_readable($filePath)) {
+                    file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-文件不可读，跳过: {$filePath}\n", FILE_APPEND);
+                    continue;
+                }
+
+                // 计算相对路径，保留目录结构
+                $relativePath = substr($filePath, strlen($sourceReal) + 1);
+                $relativePath = str_replace('\\', '/', $relativePath);
+
+                $ok = $zip->addFile($filePath, $relativePath);
+                if ($ok) {
+                    file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-添加文件 成功: {$filePath}\n", FILE_APPEND);
+                } else {
+                    $status = method_exists($zip, 'getStatusString') ? $zip->getStatusString() : 'unknown';
+                    file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-添加文件 失败: {$filePath} ; zip status: {$status}\n", FILE_APPEND);
+                }
+            }
+        }
+
+        $zip->close();
+        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-打包目录完成\n", FILE_APPEND);
+        return true;
+    }
+
+	private function _mergeInitFile($localInit, $newInit)
 	{
-	    if (!extension_loaded('zip')) {
-	        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-zip 扩展不可用\n", FILE_APPEND);
+	    if (!file_exists($localInit) || !file_exists($newInit)) {
 	        return false;
 	    }
-	    if (!file_exists($source)) {
-	        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-源目录不存在: {$source}\n", FILE_APPEND);
-	        return false;
-	    }
-
-	    file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-打包目录 {$source} 到 {$destination}\n", FILE_APPEND);
-
-	    // 删除同名目标，防止 open 失败
-	    if (file_exists($destination)) {
-	        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-发现已有同名打包文件，先删除 {$destination}\n", FILE_APPEND);
-	        @unlink($destination);
-	    }
-
-	    $zip = new ZipArchive();
-	    if ($zip->open($destination, ZipArchive::CREATE) !== TRUE) {
-	        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-无法创建打包文件 {$destination}\n", FILE_APPEND);
-	        return false;
-	    }
-
-	    $sourceReal = realpath($source);
-	    if ($sourceReal === false) {
-	        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-无法解析源目录 realpath({$source})\n", FILE_APPEND);
-	        $zip->close();
-	        return false;
-	    }
-
-	    // 检查目标 zip 是否在源目录下（若是则在遍历时排除该文件）
-	    $realDest = realpath(dirname($destination));
-	    $destInSource = ($realDest !== false && strpos($realDest . '/', $sourceReal . '/') === 0);
-
-	    file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-开始打包目录 {$sourceReal} 到 {$destination}\n", FILE_APPEND);
-
-	    $iterator = new RecursiveIteratorIterator(
-	        new RecursiveDirectoryIterator($sourceReal, FilesystemIterator::SKIP_DOTS),
-	        RecursiveIteratorIterator::SELF_FIRST
-	    );
-
-	    foreach ($iterator as $fileInfo) {
-	        $filePath = $fileInfo->getPathname();
-	        // 计算相对路径（统一为 /）
-	        $relativePath = substr($filePath, strlen($sourceReal) + 1);
-	        $relativePath = str_replace('\\', '/', $relativePath);
-
-	        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-处理条目 {$filePath}\n", FILE_APPEND);
-
-	        // 排除目标 zip 本身（避免自包含）
-	        if ($destInSource && realpath($destination) && realpath($filePath) === realpath($destination)) {
-	            file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-跳过目标 zip 自包含文件: {$filePath}\n", FILE_APPEND);
-	            continue;
-	        }
-
-	        // 如果是目录：确保在 zip 中创建目录条目（这样能保留空目录）
-	        if ($fileInfo->isDir()) {
-	            // addEmptyDir 需要相对路径
-	            $ok = $zip->addEmptyDir($relativePath);
-	            if ($ok === false) {
-	                file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-添加目录 到 zip 失败: {$relativePath}\n", FILE_APPEND);
-	            } else {
-	                file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-添加目录 到 zip: {$relativePath}\n", FILE_APPEND);
+	
+	    $localLines = file($localInit, FILE_IGNORE_NEW_LINES);
+	    $newLines   = file($newInit, FILE_IGNORE_NEW_LINES);
+	
+	    $merged = [];
+	    $hasVersionUpdated = false;
+	
+	    // 先把本地逐行写入 merged
+	    foreach ($localLines as $line) {
+	        // 匹配 VERSION 定义
+	        if (preg_match("/define\s*\(\s*'VERSION'\s*,\s*'([^']+)'\s*\)/i", $line)) {
+	            // 用新版本里的 VERSION 替换
+	            foreach ($newLines as $nline) {
+	                if (preg_match("/define\s*\(\s*'VERSION'\s*,\s*'([^']+)'\s*\)/i", $nline)) {
+	                    $line = $nline;
+	                    $hasVersionUpdated = true;
+	                    break;
+	                }
 	            }
-	            continue;
 	        }
-
-	        // 到这里是文件或符号链接等
-	        // 跳过不可读文件
-	        if (!is_readable($filePath)) {
-	            file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-文件不可读，跳过: {$filePath}\n", FILE_APPEND);
-	            continue;
-	        }
-
-	        // 普通文件：直接添加
-	        if ($fileInfo->isFile()) {
-	            $ok = $zip->addFile($filePath, $relativePath);
-	            if ($ok) {
-	                file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-添加文件 成功: {$filePath} as {$relativePath}\n", FILE_APPEND);
-	            } else {
-	                $status = method_exists($zip, 'getStatusString') ? $zip->getStatusString() : 'unknown';
-	                file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-添加文件 失败: {$filePath} as {$relativePath}; zip status: {$status}\n", FILE_APPEND);
-	            }
-	            continue;
-	        }
-
-	        // 符号链接或其他非常规类型：把链接目标写入为文本（保留信息）
-	        if ($fileInfo->isLink()) {
-	            $linkTarget = @readlink($filePath);
-	            $content = "SYMLINK -> " . ($linkTarget === false ? 'unknown' : $linkTarget);
-	            $ok = $zip->addFromString($relativePath . '.symlink.txt', $content);
-	            file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-处理符号链接: {$filePath} -> {$linkTarget} as {$relativePath}.symlink.txt\n", FILE_APPEND);
-	            continue;
-	        }
-
-	        // 其他情况一律跳过并记录
-	        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-未知条目类型，跳过: {$filePath}\n", FILE_APPEND);
+	        $merged[] = $line;
 	    }
-
-	    $zip->close();
-	    file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-打包目录完成\n", FILE_APPEND);
+	
+	    // 检查新文件里的其他 define 是否在本地缺失
+	    foreach ($newLines as $nline) {
+	        if (preg_match("/define\s*\(\s*'([^']+)'\s*,/i", $nline, $m)) {
+	            $constName = $m[1];
+	            $exists = false;
+	            foreach ($merged as $mline) {
+	                if (preg_match("/define\s*\(\s*'{$constName}'\s*,/i", $mline)) {
+	                    $exists = true;
+	                    break;
+	                }
+	            }
+	            if (!$exists) {
+	                $merged[] = $nline; // 追加缺失的 define
+	            }
+	        }
+	    }
+	
+	    // 写回
+	    file_put_contents($localInit, implode("\n", $merged) . "\n");
+	
 	    return true;
 	}
+
 
 }
