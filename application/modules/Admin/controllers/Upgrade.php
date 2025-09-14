@@ -1,12 +1,13 @@
 <?php
 
 /*
- * 功能：后台中心－升级（带 zk-cash 备用源回退）
+ * 功能：后台中心－升级（带备用源回退，且覆盖前做备份）
  * 作者: ZFAKA
  * 日期: 2025-09-13
  *
  * 当 GitHub 无法访问时，会尝试从 https://zk-cash.com/res/latest_version.txt 获取最新版本号，
  * 并可在下载失败时改为从 https://zk-cash.com/res/release.zip 获取更新包。
+ * 在覆盖前会把当前所有文件和文件夹打包为 TEMP_PATH/backup备份.zip 作为备份。
  */
 
 set_time_limit(0);
@@ -81,106 +82,118 @@ class UpgradeController extends AdminBasicController
 
     // 处理 AJAX / POST 下载请求
     public function getremotefileAction()
-	{
-	    if ($this->AdminUser == FALSE AND empty($this->AdminUser)) {
-	        $data = array('code' => 1000, 'msg' => '请登录');
-	        Helper::response($data);
-	    }
+    {
+        if ($this->AdminUser == FALSE AND empty($this->AdminUser)) {
+            $data = array('code' => 1000, 'msg' => '请登录');
+            Helper::response($data);
+        }
 
-	    $method = $this->getPost('method', false);
-	    if ($method && $method == 'download') {
-	        $extractDir = null;
-	        $localZip = null;
+        $method = $this->getPost('method', false);
+        if ($method && $method == 'download') {
+            $extractDir = null;
+            $localZip = null;
 
-	        try {
-	            $up_version = $this->getSession('up_version');
-	            if (!$up_version) {
-	                $up_version = $this->_getUpdateVersion();
-	                $this->setSession('up_version', $up_version);
-	            }
+            try {
+                $up_version = $this->getSession('up_version');
+                if (!$up_version) {
+                    $up_version = $this->_getUpdateVersion();
+                    $this->setSession('up_version', $up_version);
+                }
 
-	            // 只有当本地 VERSION < up_version 才允许下载
-	            if (version_compare($this->normalizeVersion(VERSION), $this->normalizeVersion($up_version), '<')) {
-	                // 优先尝试 GitHub 官方 zip
-	                $gitZipUrl = sprintf($this->zip_template, $up_version);
-	                try {
-	                    $localZip = $this->_download($gitZipUrl, TEMP_PATH);
-	                } catch (\Exception $e) {
-	                    $localZip = false;
-	                }
+                // 只有当本地 VERSION < up_version 才允许下载
+                if (version_compare($this->normalizeVersion(VERSION), $this->normalizeVersion($up_version), '<')) {
+                    // 优先尝试 GitHub 官方 zip
+                    $gitZipUrl = sprintf($this->zip_template, $up_version);
+                    try {
+                        $localZip = $this->_download($gitZipUrl, TEMP_PATH);
+                    } catch (\Exception $e) {
+                        $localZip = false;
+                    }
 
-	                // 如果 GitHub 下载失败，尝试备用域名提供的 release.zip
-	                if (!$localZip) {
-	                    $fallbackUrl = rtrim($this->fallback_base, '/') . $this->fallback_zip_file;
-	                    try {
-	                        $localZip = $this->_download($fallbackUrl, TEMP_PATH);
-	                    } catch (\Exception $e) {
-	                        throw new \Exception('下载失败：GitHub 与备用源均不可用. ' . $e->getMessage());
-	                    }
-	                }
+                    // 如果 GitHub 下载失败，尝试备用域名提供的 release.zip
+                    if (!$localZip) {
+                        $fallbackUrl = rtrim($this->fallback_base, '/') . $this->fallback_zip_file;
+                        try {
+                            $localZip = $this->_download($fallbackUrl, TEMP_PATH);
+                        } catch (\Exception $e) {
+                            throw new \Exception('下载失败：GitHub 与备用源均不可用. ' . $e->getMessage());
+                        }
+                    }
 
-	                if ($localZip && file_exists($localZip)) {
-	                    // 引入工具函数
-	                    \Yaf\Loader::import(FUNC_PATH . '/F_File.php');
+                    if ($localZip && file_exists($localZip)) {
+                        // 引入工具函数
+                        \Yaf\Loader::import(FUNC_PATH . '/F_File.php');
 
-	                    // 解压到临时目录
-	                    $extractDir = rtrim(TEMP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'zfaka-' . $up_version;
-	                    if (!is_dir($extractDir)) {
-	                        @mkdir($extractDir, 0777, true);
-	                    }
-	                    $unzipOk = $this->_unzip($localZip, $extractDir);
+                        // 解压到临时目录
+                        $extractDir = rtrim(TEMP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'zfaka-' . $up_version;
+                        if (!is_dir($extractDir)) {
+                            @mkdir($extractDir, 0777, true);
+                        }
+                        $unzipOk = $this->_unzip($localZip, $extractDir);
 
-	                    if ($unzipOk) {
-	                        // 保存管理员目录名
-	                        $admin_dir = ADMIN_DIR;
+                        if ($unzipOk) {
+                            // === 新增：先备份当前 APP_PATH 到 TEMP_PATH/backup备份.zip ===
+                            $backupZip = rtrim(TEMP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'backup备份.zip';
+                            // 若已存在同名备份，先删除（按你的要求使用该固定名称）
+                            if (file_exists($backupZip)) {
+                                @unlink($backupZip);
+                            }
+                            $zipOk = $this->_zipDirectory(APP_PATH, $backupZip);
+                            if ($zipOk !== true) {
+                                throw new \Exception('备份失败：无法打包当前项目到 ' . $backupZip);
+                            }
+                            // === 备份完成，继续覆盖 ===
 
-	                        // 覆盖核心文件
-	                        xCopy($extractDir . '/ZFAKA-main', APP_PATH, 1);
+                            // 保存管理员目录名
+                            $admin_dir = ADMIN_DIR;
 
-	                        // 单独处理 Admin 覆盖
-	                        $pkgAdminCandidates = array(
-	                            $extractDir . '/ZFAKA-main/application/modules/Admin',
-	                            $extractDir . '/application/modules/Admin',
-	                        );
-	                        $targetAdmin = APP_PATH . '/application/modules/' . $admin_dir;
+                            // 覆盖核心文件（把解压后的 ZFAKA-main 覆盖到 APP_PATH）
+                            xCopy($extractDir . '/ZFAKA-main', APP_PATH, 1);
 
-	                        foreach ($pkgAdminCandidates as $pkgAdmin) {
-	                            if (is_dir($pkgAdmin)) {
-	                                if (!is_dir(dirname($targetAdmin))) {
-	                                    @mkdir(dirname($targetAdmin), 0777, true);
-	                                }
-	                                xCopy($pkgAdmin, $targetAdmin, 1);
-	                                break;
-	                            }
-	                        }
+                            // 单独处理 Admin 覆盖（包内的 Admin 覆盖到实际 ADMIN_DIR）
+                            $pkgAdminCandidates = array(
+                                $extractDir . '/ZFAKA-main/application/modules/Admin',
+                                $extractDir . '/application/modules/Admin',
+                            );
+                            $targetAdmin = rtrim(APP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . $admin_dir;
 
-	                        $data = array('code' => 1, 'msg' => 'ok');
-	                    } else {
-	                        $data = array('code' => 1000, 'msg' => '解压失败');
-	                    }
-	                } else {
-	                    $data = array('code' => 1000, 'msg' => '下载失败');
-	                }
-	            } else {
-	                $data = array('code' => 1000, 'msg' => '没有可用的升级包');
-	            }
-	        } catch (\Exception $e) {
-	            $data = array('code' => 1000, 'msg' => '更新失败: ' . $e->getMessage());
-	        } finally {
-	            // 统一清理
-	            if ($localZip && file_exists($localZip)) {
-	                @unlink($localZip);
-	            }
-	            if ($extractDir && is_dir($extractDir)) {
-	                delDir($extractDir);
-	            }
-	        }
-	    } else {
-	        $data = array('code' => 1000, 'msg' => '缺失参数');
-	    }
+                            foreach ($pkgAdminCandidates as $pkgAdmin) {
+                                if (is_dir($pkgAdmin)) {
+                                    if (!is_dir(dirname($targetAdmin))) {
+                                        @mkdir(dirname($targetAdmin), 0777, true);
+                                    }
+                                    xCopy($pkgAdmin, $targetAdmin, 1);
+                                    break;
+                                }
+                            }
 
-	    Helper::response($data);
-	}
+                            $data = array('code' => 1, 'msg' => 'ok');
+                        } else {
+                            $data = array('code' => 1000, 'msg' => '解压失败');
+                        }
+                    } else {
+                        $data = array('code' => 1000, 'msg' => '下载失败');
+                    }
+                } else {
+                    $data = array('code' => 1000, 'msg' => '没有可用的升级包');
+                }
+            } catch (\Exception $e) {
+                $data = array('code' => 1000, 'msg' => '更新失败: ' . $e->getMessage());
+            } finally {
+                // 统一清理下载文件与解压目录（备份文件保留）
+                if ($localZip && file_exists($localZip)) {
+                    @unlink($localZip);
+                }
+                if ($extractDir && is_dir($extractDir)) {
+                    delDir($extractDir);
+                }
+            }
+        } else {
+            $data = array('code' => 1000, 'msg' => '缺失参数');
+        }
+
+        Helper::response($data);
+    }
 
     // 获取远程最新版本（优先 GitHub API，失败回退到 zk-cash 的 latest_version.txt）
     private function _getUpdateVersion()
@@ -347,11 +360,59 @@ class UpgradeController extends AdminBasicController
         return $v;
     }
 
-    // 辅助：看起来是否像非法版本（极简单判断）
+    // 辅助：看起来是否像非法版本（极简单判断)
     private function looksLikeInvalidVersion($v)
     {
         if (empty($v)) return true;
         $nv = $this->normalizeVersion($v);
         return !preg_match('/^\d+(\.\d+)*/', $nv);
+    }
+
+    /**
+     * 将目录 $source 打包为 zip 文件 $destination
+     * 返回 true 表示成功，false 或抛异常表示失败
+     */
+    private function _zipDirectory($source, $destination)
+    {
+        if (!extension_loaded('zip')) {
+            return false;
+        }
+        if (!file_exists($source)) {
+            return false;
+        }
+
+        // 删除同名目标，防止 open 失败
+        if (file_exists($destination)) {
+            @unlink($destination);
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($destination, ZipArchive::CREATE) !== TRUE) {
+            return false;
+        }
+
+        $source = realpath($source);
+        if (is_dir($source)) {
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($source),
+                RecursiveIteratorIterator::LEAVES_ONLY
+            );
+            foreach ($files as $name => $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    // 计算相对路径，保留目录结构
+                    $relativePath = substr($filePath, strlen($source) + 1);
+                    // Windows 下处理反斜杠
+                    $relativePath = str_replace('\\', '/', $relativePath);
+                    $zip->addFile($filePath, $relativePath);
+                }
+            }
+        } else {
+            // 单文件
+            $zip->addFile($source, basename($source));
+        }
+
+        $zip->close();
+        return true;
     }
 }
