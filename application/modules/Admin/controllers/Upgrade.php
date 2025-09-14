@@ -232,9 +232,11 @@ class UpgradeController extends AdminBasicController
                                     // 先复制
                                     xCopy($pkgAdmin, $targetAdmin, 1);
                                     // 复制成功后删除包内的 Admin 源（达到“移动”的效果）
-                                    if (is_dir($pkgAdmin)) {
-                                        rrmdir($pkgAdmin);
-                                        file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "已删除包内管理员源: {$pkgAdmin}\n", FILE_APPEND);
+
+                                    $AdminDirtoRemove = rtrim(APP_PATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . 'Admin';
+                                    if (is_dir($AdminDirtoRemove) && realpath($AdminDirtoRemove) !== realpath($targetAdmin)) {
+                                        rrmdir($AdminDirtoRemove);
+                                        file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "已删除多余管理员源: {$AdminDirtoRemove}\n", FILE_APPEND);
                                     }
                                     break;
                                 }
