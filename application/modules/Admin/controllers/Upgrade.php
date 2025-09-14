@@ -233,7 +233,7 @@ class UpgradeController extends AdminBasicController
                                     xCopy($pkgAdmin, $targetAdmin, 1);
                                     // 复制成功后删除包内的 Admin 源（达到“移动”的效果）
                                     if (is_dir($pkgAdmin)) {
-                                        delDir($pkgAdmin);
+                                        rrmdir($pkgAdmin);
                                         file_put_contents(UPGRADE_FILE, CUR_DATETIME . '-' . "已删除包内管理员源: {$pkgAdmin}\n", FILE_APPEND);
                                     }
                                     break;
@@ -260,7 +260,7 @@ class UpgradeController extends AdminBasicController
                     @unlink($localZip);
                 }
                 if ($extractDir && is_dir($extractDir)) {
-                    delDir($extractDir);
+                    rrmdir($extractDir);
                 }
             }
         } else {
@@ -537,13 +537,13 @@ class UpgradeController extends AdminBasicController
 	    if (!file_exists($localInit) || !file_exists($newInit)) {
 	        return false;
 	    }
-	
+
 	    $localLines = file($localInit, FILE_IGNORE_NEW_LINES);
 	    $newLines   = file($newInit, FILE_IGNORE_NEW_LINES);
-	
+
 	    $merged = [];
 	    $hasVersionUpdated = false;
-	
+
 	    // 先把本地逐行写入 merged
 	    foreach ($localLines as $line) {
 	        // 匹配 VERSION 定义
@@ -559,7 +559,7 @@ class UpgradeController extends AdminBasicController
 	        }
 	        $merged[] = $line;
 	    }
-	
+
 	    // 检查新文件里的其他 define 是否在本地缺失
 	    foreach ($newLines as $nline) {
 	        if (preg_match("/define\s*\(\s*'([^']+)'\s*,/i", $nline, $m)) {
@@ -576,12 +576,57 @@ class UpgradeController extends AdminBasicController
 	            }
 	        }
 	    }
-	
+
 	    // 写回
 	    file_put_contents($localInit, implode("\n", $merged) . "\n");
-	
+
 	    return true;
 	}
 
+	/**
+	 * 递归删除目录及其所有内容（删除目录本身）。
+	 * 返回 true 表示已删除或目录不存在；false 表示失败。
+	 * 安全措施：会尝试 realpath 并拒绝删除根目录或空路径。
+	 */
+	private function rrmdir($dir)
+	{
+	    if (empty($dir)) return false;
+	    // 标准化路径
+	    $dir = rtrim($dir, DIRECTORY_SEPARATOR);
+
+	    // 解析真实路径，避免符号链接逃逸
+	    $real = realpath($dir);
+	    if ($real === false) {
+	        // 目录不存在，视为已删除
+	        return true;
+	    }
+
+	    // 安全检查：避免意外删除系统根目录或空字符串
+	    if ($real === DIRECTORY_SEPARATOR || $real === '' || $real === '/' ) {
+	        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-拒绝删除根目录: {$real}\n", FILE_APPEND);
+	        return false;
+	    }
+
+	    // 遍历并删除
+	    try {
+	        $it = new \RecursiveIteratorIterator(
+	            new \RecursiveDirectoryIterator($real, \FilesystemIterator::SKIP_DOTS),
+	            \RecursiveIteratorIterator::CHILD_FIRST
+	        );
+	        foreach ($it as $item) {
+	            $path = $item->getRealPath();
+	            if ($item->isDir()) {
+	                @rmdir($path);
+	            } else {
+	                @unlink($path);
+	            }
+	        }
+	        // 最后删除根目录
+	        return @rmdir($real);
+	    } catch (\Exception $e) {
+	        file_put_contents(UPGRADE_FILE, CUR_DATETIME . "-rrmdir 异常: " . $e->getMessage() . " path={$real}\n", FILE_APPEND);
+	        return false;
+	    }
+	}
 
 }

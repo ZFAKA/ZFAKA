@@ -12,7 +12,7 @@ class UpgradeController extends AdminBasicController
 	public function init()
     {
         parent::init();
-		$this->all_version = ['1.0.0','1.0.2','1.0.3','1.0.4','1.0.5','1.0.6','1.0.7','1.0.8','1.0.9','1.1.0','1.1.1','1.1.2','1.1.3','1.1.4','1.1.5','1.1.6','1.1.7','1.1.8','1.1.9','1.2.0','1.2.1','1.2.2','1.2.3','1.2.4','1.2.5','1.2.6','1.2.7','1.2.8','1.2.9','1.3.0','1.3.1','1.3.3','1.3.4','1.3.5','1.3.6','1.3.7','1.3.8','1.3.9','1.4.0','1.4.1','1.4.2','1.4.3','1.4.4','1.4.5','1.4.6'];
+		$this->all_version = ['1.0.0','1.0.2','1.0.3','1.0.4','1.0.5','1.0.6','1.0.7','1.0.8','1.0.9','1.1.0','1.1.1','1.1.2','1.1.3','1.1.4','1.1.5','1.1.6','1.1.7','1.1.8','1.1.9','1.2.0','1.2.1','1.2.2','1.2.3','1.2.4','1.2.5','1.2.6','1.2.7','1.2.8','1.2.9','1.3.0','1.3.1','1.3.3','1.3.4','1.3.5','1.3.6','1.3.7','1.3.8','1.3.9','1.4.0','1.4.1','1.4.2','1.4.3','1.4.4','1.4.5','1.4.6','1.4.7'];
     }
 
     public function indexAction()
@@ -29,7 +29,7 @@ class UpgradeController extends AdminBasicController
 			$version = str_replace(array("\r","\n","\t"), "", $version);
 			$version = strlen(trim($version))>0?$version:'1.0.0';
 
-			if(version_compare(trim($version), trim(VERSION), '<' )){
+			if(version_compare($this->normalizeVersion($version), $this->normalizeVersion(VERSION), '<' )){
 				$data = array();
 				$update_version = $this->_getUpdateVersion($version);
 				if($update_version==''){
@@ -38,7 +38,7 @@ class UpgradeController extends AdminBasicController
 					$data['upgrade_sql'] = '';
 					$data['button'] = false;
 				}else{
-					if(version_compare(trim($update_version),trim(VERSION),  '<=' )){
+					if(version_compare($this->normalizeVersion($update_version),$this->normalizeVersion(VERSION),  '<=' )){
 						$data['update_version'] = $update_version;
 						$desc = @file_get_contents(INSTALL_PATH.'/'.$update_version.'/upgrade.txt');
 						$data['upgrade_desc'] = $desc;
@@ -80,7 +80,7 @@ class UpgradeController extends AdminBasicController
 				$version = @file_get_contents(INSTALL_LOCK);
 				$version = str_replace(array("\r","\n","\t"), "", $version);
 				$version = strlen(trim($version))>0?$version:'1.0.0';
-				if(version_compare(trim($version), trim(VERSION), '<' )){
+				if(version_compare($this->normalizeVersion($version), $this->normalizeVersion(VERSION), '<' )){
 					$update_version = $this->_getUpdateVersion($version);
 					if($update_version==''){
 						$data = array('code' => 1, 'msg' =>"版本信息异常");
@@ -142,4 +142,14 @@ class UpgradeController extends AdminBasicController
 		}
 		return end($this->all_version);
 	}
+
+	// 辅助：去掉前导 v 或空白，统一版本格式
+    private function normalizeVersion($v)
+    {
+        $v = trim($v);
+        if (strlen($v) > 0 && ($v[0] == 'v' || $v[0] == 'V')) {
+            $v = substr($v, 1);
+        }
+        return $v;
+    }
 }
