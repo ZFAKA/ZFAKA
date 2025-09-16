@@ -5,6 +5,9 @@
   <img src="https://img.shields.io/badge/license-MIT-blue">
   <img src="https://img.shields.io/badge/version-1.4.6-red">
   <img src="https://img.shields.io/badge/PHP-7.x-grey">
+  <a href="https://t.me/ZFAKA_dev">
+    <img src="https://img.shields.io/badge/Telegram-纸飞机-blue?logo=telegram" />
+  </a>
 </p>
 
 # ZFAKA自动售货系统
@@ -15,6 +18,7 @@
 永久免费、绝对开源，欢迎提供各种需求和意见与建议。  
 1.4.5版本中存在的漏洞已修复，可放心使用  
 
+[![Telegram](https://img.shields.io/badge/Telegram-联系作者-blue?logo=telegram&style=for-the-badge)](https://t.me/ZFAKA_dev)  
 # 模板展示
 
 模板1
