@@ -58,9 +58,9 @@
 * 支持在后台编辑并发布文章；
 	
 1.5 支付渠道
-* 官方接口－U支付
+* 官方接口－U支付 （USDT TRC20） （教程：[配置支付方式‐U支付（USDT TRC20）](https://github.com/ZFAKA/ZFAKA/wiki/%E9%85%8D%E7%BD%AE%E6%94%AF%E4%BB%98%E6%96%B9%E5%BC%8F%E2%80%90U%E6%94%AF%E4%BB%98%EF%BC%88USDT-TRC20%EF%BC%89)）
 
-* 官方接口－V免签
+* 官方接口－V免签 （教程：[配置支付方式‐V免签（微信 支付宝）](https://github.com/ZFAKA/ZFAKA/wiki/%E9%85%8D%E7%BD%AE%E6%94%AF%E4%BB%98%E6%96%B9%E5%BC%8F%E2%80%90V%E5%85%8D%E7%AD%BE%EF%BC%88%E5%BE%AE%E4%BF%A1-%E6%94%AF%E4%BB%98%E5%AE%9D%EF%BC%89)）
 
 * 官方接口－支付宝当面付
 
