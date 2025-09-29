@@ -16,7 +16,9 @@ class vpaywx
     public function pay($payconfig,$params)
     {
         try {
-            $payGateWay= $payconfig['configure3'].'/createOrder';
+            $payGateWay = $payconfig['configure3'];
+            $payGateWay = rtrim($payGateWay, '/') . '/';
+	        $payGateWay = $payGateWay . 'createOrder';
             $payId =$params['orderid'];
             $type  =1;//微信
             $price =(float)$params['money'];

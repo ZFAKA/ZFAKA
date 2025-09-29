@@ -20,14 +20,15 @@ class zfbf2f
 	//处理请求
 	public function pay($payconfig,$params)
 	{
+		$params['weburl'] = rtrim($params['weburl'], '/') . '/';
 		$config = [
 			'use_sandbox' => false,
 			'app_id' => $payconfig['app_id'],
 			'sign_type' => $payconfig['sign_type'],
 			'ali_public_key' => $payconfig['ali_public_key'],
 			'rsa_private_key' => $payconfig['rsa_private_key'],
-			'return_url' => $params['weburl']. "/query/auto/{$params['orderid']}.html",
-			'notify_url' => $params['weburl'] . '/product/notify/?paymethod='.$this->paymethod,
+			'return_url' => $params['weburl']. "query/auto/{$params['orderid']}.html",
+			'notify_url' => $params['weburl'] . 'product/notify/?paymethod='.$this->paymethod,
 			'return_raw' => true
 		];
 	

@@ -17,7 +17,9 @@ class vpayalipay
 	{
 		try
 		{
-	    $payGateWay= $payconfig['configure3'].'/createOrder';
+            $payGateWay = $payconfig['configure3'];
+            $payGateWay = rtrim($payGateWay, '/') . '/';
+	        $payGateWay = $payGateWay . 'createOrder';
             $payId =$params['orderid'];
             $type  =2;//支付宝
             $price =(float)$params['money'];
