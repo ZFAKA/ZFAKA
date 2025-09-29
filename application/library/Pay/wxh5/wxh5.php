@@ -20,6 +20,7 @@ class wxh5
 	//处理请求
 	public function pay($payconfig,$params)
 	{
+		$params['weburl'] = rtrim($params['weburl'], '/') . '/';
 		$config = [
 			'use_sandbox' => false,
 			'app_id' => $payconfig['app_id'],
@@ -29,8 +30,8 @@ class wxh5
 			'app_cert_pem' => LIB_PATH.'Pay/'.$this->paymethod.'/pem/weixin_app_cert.pem',
 			'app_key_pem' => LIB_PATH.'Pay/'.$this->paymethod.'/pem/weixin_app_key.pem',
 			'fee_type'  => 'CNY',
-			'redirect_url' => $params['weburl']. "/query/auto/{$params['orderid']}.html",
-			'notify_url' => $params['weburl'] . "/notify/{$this->paymethod}.html",
+			'redirect_url' => $params['weburl']. "query/auto/{$params['orderid']}.html",
+			'notify_url' => $params['weburl'] . "notify/{$this->paymethod}.html",
 			'return_raw' => true
 		];
 
@@ -74,6 +75,7 @@ class wxh5
 	public function notify(array $payconfig)
 	{
 		try {
+			$params['weburl'] = rtrim($params['weburl'], '/') . '/';
 			file_put_contents(YEWU_FILE, CUR_DATETIME.'-params:'.json_encode($_POST).PHP_EOL, FILE_APPEND);
 			$config = [
 				'use_sandbox' => false,
@@ -84,7 +86,7 @@ class wxh5
 				'app_cert_pem' => LIB_PATH.'Pay/'.$this->paymethod.'/pem/weixin_app_cert.pem',
 				'app_key_pem' => LIB_PATH.'Pay/'.$this->paymethod.'/pem/weixin_app_key.pem',
 				'fee_type'  => 'CNY',
-				'notify_url' => $params['weburl'] . "/notify/{$this->paymethod}.html",
+				'notify_url' => $params['weburl'] . "notify/{$this->paymethod}.html",
 				'return_raw' => true
 			];
 			$callback = new \Pay\wxh5\callback();
