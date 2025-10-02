@@ -9,9 +9,7 @@
 class IndexController extends AdminBasicController
 {
 	private $github_url = "https://api.github.com/repos/ZFAKA/ZFAKA/releases";
-	private $remote_version = '';
 	private $m_order;
-	private $versiondomain = "ver.zfaka.sql.pub";
 	private $fallback_base = 'https://zk-cash.com/res';
 
 	public function init()
@@ -59,21 +57,23 @@ class IndexController extends AdminBasicController
 		$method = $this->getPost('method',false);
 		if($method AND $method=='updatecheck'){
 			if ($this->VerifyCsrfToken($csrf_token)) {
-				$up_version = $this->getSession('up_version');
-				if(!$up_version){
-					$up_version = $this->_getUpdateVersion();
-					$this->setSession('up_version',$up_version);
-				}
-				if(version_compare($this->normalizeVersion(VERSION), $this->normalizeVersion($up_version), '<' )){
+				list($allVersions, $latestVersion) = $this->_getAllVersionsWithFallback();
+				$this->setSession('all_versions',$allVersions);
+				$this->setSession('up_version',$latestVersion);
+				if(version_compare($this->normalizeVersion(VERSION), $this->normalizeVersion($latestVersion), '<' )) {
 					$params = array(
 						'update'=>1,
 						'url'=>$this->github_url,
-						'zip'=>sprintf("https://github.com/ZFAKA/ZFAKA/releases/download/%s/ZFAKA-main.zip", $up_version),
-						'fallback_zip'=>rtrim($this->fallback_base, '/').'/release.zip'
+						'zip'=>sprintf("https://github.com/ZFAKA/ZFAKA/releases/download/%s/ZFAKA-main.zip", $latestVersion),
+						'fallback_zip'=>rtrim($this->fallback_base, '/').'/release.zip',
+						'all_versions'=>$allVersions
 					);
 					$data = array('code' => 1, 'msg' => '有更新','data'=>$params);
 				}else{
-					$params = array('update'=>0,'url'=>$this->github_url,'remote_version'=>$this->remote_version);
+					$params = array(
+						'update'=>0,
+						'url'=>$this->github_url,
+					);
 					$data = array('code' => 1, 'msg' => '没有更新','data'=>$params);
 				}
 			} else {
@@ -85,25 +85,66 @@ class IndexController extends AdminBasicController
 		Helper::response($data);
 	}
 
-	private function _getUpdateVersion()
+	/**
+	 * 新增：获取所有版本（优先GitHub，失败则走备用）
+	 * @return array [所有版本数组, 最新版本号]
+	 */
+	private function _getAllVersionsWithFallback()
 	{
-		$version = VERSION;
-		try{
-			$version_json= $this->_get_url_contents($this->github_url);
-			$arr = json_decode($version_json,true);
-			if (is_array($arr) && count($arr) > 0) {
-				$latest_version = $arr[0];
-				if (isset($latest_version['tag_name'])) {
-					$version = $latest_version['tag_name'];
+		$allVersions = [];
+
+		try {
+			// 1. 优先从GitHub获取所有版本
+			$version_json = $this->_get_url_contents($this->github_url);
+			$githubArr = json_decode($version_json, true);
+
+			if (is_array($githubArr) && count($githubArr) > 0) {
+				foreach ($githubArr as $release) {
+					$allVersions[] = [
+						'tag_name' => $release['tag_name'] ?? '',
+						'body' => $release['body'] ?? '无版本说明',
+						'published_at' => isset($release['published_at']) ? date('Y-m-d', strtotime($release['published_at'])) : '',
+						'source' => 'github' // 标记来源：GitHub
+					];
+					file_put_contents(YEWU_FILE, 'body:'.$release['body'] ?? '无版本说明', FILE_APPEND);
 				}
+				$latestVersion = $allVersions[0]['tag_name'] ?? VERSION;
+				return [$allVersions, $latestVersion];
 			}
-			if (empty($version) || !$this->looksLikeValidVersion($version)) {
-				$version = $this->_getVersionFromFallback();
-			}
-		} catch(\Exception $e) {
-			$version = $this->_getVersionFromFallback();
+		} catch (\Exception $e) {
+			// GitHub请求失败，走备用逻辑
 		}
-		return $version;
+
+		// 2. 备用逻辑：从 fallback_base 获取所有版本
+		try {
+			$allVersionsUrl = rtrim($this->fallback_base, '/') . '/all_versions.txt';
+			$fallbackJson = $this->_get_url_contents($allVersionsUrl);
+			$fallbackArr = json_decode($fallbackJson, true);
+
+			if (is_array($fallbackArr) && count($fallbackArr) > 0) {
+				foreach ($fallbackArr as $release) {
+					$allVersions[] = [
+						'tag_name' => $release['tag_name'] ?? '',
+						'body' => $release['body'] ?? '无版本说明',
+						'published_at' => isset($release['published_at']) ? date('Y-m-d', strtotime($release['published_at'])) : '',
+						'source' => 'fallback' // 标记来源：备用地址
+					];
+				}
+				$latestVersion = $allVersions[0]['tag_name'] ?? VERSION;
+				return [$allVersions, $latestVersion];
+			}
+		} catch (\Exception $e) {
+			
+		}
+		// 3. 都失败了，仅获取最新版本
+		$fallbackVersion = $this->_getVersionFromFallback();
+		$allVersions[] = [
+			'tag_name' => $fallbackVersion,
+			'body' => "备用地址获取的版本（{$fallbackVersion}），无详细更新记录",
+			'published_at' => '',
+			'source' => 'fallback'
+		];
+		return [$allVersions, $fallbackVersion];
 	}
 	
 	private function _get_url_contents($url,$params='')

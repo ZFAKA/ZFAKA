@@ -94,5 +94,11 @@
 <!--引入公共底文件-->
 <?php include ADMIN_COMMON_PATH.'/footer.html';?>
 <script>
-layui.use('adminindex');
+layui.use('adminindex', function() {
+  // 页面加载完成后自动触发检查更新按钮的点击事件
+  var adminindex = layui.adminindex;
+  setTimeout(function() {
+        adminindex.checkUpdate(true);
+    }, 500);
+});
 </script>
