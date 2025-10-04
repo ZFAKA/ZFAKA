@@ -2,9 +2,9 @@
   <img width="455" height="116" alt="new_logo" src="https://github.com/user-attachments/assets/56c6e3ff-2e89-4996-b9f7-55fb0aef9ed9" />
 </p>
 <p align="center">
-  <img src="https://img.shields.io/badge/license-MIT-blue">
-  <img src="https://img.shields.io/badge/version-1.4.6-red">
-  <img src="https://img.shields.io/badge/PHP-7.x-grey">
+  <img src="https://img.shields.io/badge/OS-Windows | Linux-blue">
+  <img src="https://img.shields.io/badge/version-1.4.6-blue">
+  <img src="https://img.shields.io/badge/PHP-7.x-blue">
   <a href="https://t.me/ZFAKA_dev">
     <img src="https://img.shields.io/badge/Telegram-纸飞机-blue?logo=telegram" />
   </a>
@@ -38,6 +38,7 @@
 <img width="800" alt="article1" src="https://github.com/user-attachments/assets/109985da-554a-4c8b-9bc4-ed80960e4b29" />
 
 # 系统优势  
+* 支持windows和linux  
 * SEO优化：新增文章模块  
 * 安全：旧版漏洞已修复  
 * 全部开源，永久免费，长期技术更新支持  
@@ -81,15 +82,15 @@
 
 ## 2.1 安装zfaka
 
->强烈推介使用宝塔环境安装，可以省去很多配置步骤，而且快，主要是不容易出错
+>ZFAKA并不是非得在宝塔环境下才能安装，只是这种安装方式是最快也是最稳定的，熟悉之后三分钟就能搭好，完全避免浪费时间在环境配置上。如果你自己在非宝塔环境下安装遇到问题，请自行寻找解决方法。
 
 ### 2.1.1 宝塔环境安装zfaka
 >参考：[宝塔环境安装zfaka](https://github.com/ZFAKA/ZFAKA/wiki/%E5%AE%9D%E5%A1%94%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85zfaka).
 
-### 2.1.2 lnmp环境
+### 2.1.2 lnmp环境 (宝塔安装不需要看)
 >参考：[lnmp环境中如何进行配置](https://github.com/ZFAKA/ZFAKA/wiki/lnmp%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E9%85%8D%E7%BD%AE).
 
-### 2.1.2.1 lnmp环境安装YAF
+### 2.1.2.1 lnmp环境安装YAF (宝塔安装不需要看)
 >参考：[lnmp环境中如何安装yaf](https://github.com/ZFAKA/ZFAKA/wiki/lnmp%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%A6%82%E4%BD%95%E5%AE%89%E8%A3%85yaf).
 
 ### 2.1.3 rewrite配置 (宝塔安装不需要看)
