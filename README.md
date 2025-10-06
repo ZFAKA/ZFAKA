@@ -15,8 +15,9 @@
 >**郑重申明：本项目为开源程序，仅做技术交流使用**
 
 演示地址：https://zk-cash.com/  
-永久免费、绝对开源，欢迎提供各种需求和意见与建议。  
-1.4.5版本中存在的漏洞已修复，可放心使用  
+永久免费、完全开源，欢迎提供各种需求和意见与建议。  
+[加入群组](https://t.me/ZFAKA_group)  
+历史漏洞已修复，可放心使用  
 
 [![Telegram](https://img.shields.io/badge/Telegram-联系作者-blue?logo=telegram&style=for-the-badge)](https://t.me/ZFAKA_dev)  
 # 模板展示

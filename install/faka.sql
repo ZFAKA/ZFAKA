@@ -85,7 +85,7 @@ INSERT INTO `t_config` (`id`, `catid`, `name`, `value`, `tag`, `lock`, `updateti
 (8, 1, 'notice', '本系统商品均可正常购买。开源下载地址：github地址:&lt;a href=&quot;https://github.com/zfaka/zfaka/&quot; target=&quot;_blank&quot;&gt;https://github.com/zfaka/zfaka/&lt;/a&gt;', '首页公告', 1, 1453452674),
 (9, 1, 'ad', '&lt;image src=&quot;/res/images/pay/supportme.jpg&quot;&gt;', '购买页默认内容', 1, 1453452674),
 (10, 1, 'yzmswitch', '1', '验证码开关(1开，0关)', 1, 1453452674),
-(11, 1, 'orderinputtype', '2', '订单必填输入框选择: 1邮箱 2QQ', 1, 1453452674),
+(11, 1, 'orderinputtype', '1', '订单必填输入框选择: 1邮箱 2QQ', 1, 1453452674),
 (13, 1, 'logo', '/res/images/logo.png', 'LOGO地址,默认：/res/images/logo.png', 1, 1453452674),
 (14, 1, 'tongji', '<!--统计js-->', '统计脚本', 1, 1453452674),
 (15, 1, 'mprodcutdescriptionswitch', '0', '移动端商品详情，隐藏(0)|显示(1)', 1, 1453452674),
