@@ -39,6 +39,7 @@
 <img width="800" alt="article1" src="https://github.com/user-attachments/assets/109985da-554a-4c8b-9bc4-ed80960e4b29" />
 
 # 系统优势  
+* 支持USDT收款
 * 支持windows和linux  
 * SEO优化：新增文章模块  
 * 安全：旧版漏洞已修复  
@@ -96,6 +97,9 @@
 
 ### 2.1.3 rewrite配置 (宝塔安装不需要看)
 >参考：[rewrite配置](https://github.com/ZFAKA/ZFAKA/wiki/rewrite%E9%85%8D%E7%BD%AE).
+
+### 2.1.4 lamp环境（apache）安装ZFAKA (宝塔安装不需要看)
+>参考：[lamp环境(apache)中如何安装ZFAKA](https://github.com/ZFAKA/ZFAKA/wiki/lamp%E7%8E%AF%E5%A2%83(apache)%E4%B8%AD%E5%A6%82%E4%BD%95%E5%AE%89%E8%A3%85ZFAKA).
 
 ## 非宝塔安装出现问题请检查：
 
